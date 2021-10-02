@@ -38,7 +38,6 @@ export default class Game extends Phaser.Scene {
     this.clockTime = C.TIME_PER_LEVEL
     this.clock = this.add.text(700, 32, this.clockTime.toString());  
     const timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
-
   }
 
   onEvent()
@@ -62,8 +61,8 @@ export default class Game extends Phaser.Scene {
 const config = {
   type: Phaser.AUTO,
   backgroundColor: "#125555",
-  width: 800,
-  height: 600,
+  width: C.SCREEN_WIDTH,
+  height: C.SCREEN_HEIGHT,
   scene: Game,
 };
 
