@@ -8,7 +8,7 @@ export default class Game extends Phaser.Scene {
   rack: Rack;
   columns: Column[];
   clock: Phaser.GameObjects.Text;
-  clockTime: number
+  clockTime: number;
 
   constructor() {
     super("game");
@@ -29,33 +29,51 @@ export default class Game extends Phaser.Scene {
     this.add.existing(this.rack);
     this.columns = [];
     for (let i = 0; i < 6; i++) {
-      const column = new Column(this, i, ["A", "B", "C"], word_dict, ()=>{});
+      const column = new Column(this, i, ["A", "B", "C"], word_dict, () => {});
       this.columns.push(column);
       this.add.existing(column);
     }
-    this.columns[0].isCorrectWord()
-    this.columns[0].addNewButton()
-    this.clockTime = C.TIME_PER_LEVEL
-    this.clock = this.add.text(700, 32, this.clockTime.toString());  
-    const timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
+    this.columns[0].isCorrectWord();
+    this.columns[0].addNewButton();
+    this.clockTime = C.TIME_PER_LEVEL;
+    this.clock = this.add.text(700, 32, this.clockTime.toString());
+    const timedEvent = this.time.addEvent({
+      delay: 1000,
+      callback: this.onEvent,
+      callbackScope: this,
+      loop: true,
+    });
 
+    this.input.keyboard.on(
+      "keydown-R",
+      function () {
+        this.rack.removeTile(0);
+      },
+      this
+    );
+    this.input.keyboard.on(
+      "keydown-A",
+      function () {
+        console.log(this.rack.addTile("F"));
+      },
+      this
+    );
   }
 
-  onEvent()
-  {
-      this.clockTime -= 1; // One second
-      if (this.clockTime <= 0) {
-        for (let column of this.columns) {
-          // handle earthquakes
-          // column.earthquake();
-        }
-        this.clockTime = C.TIME_PER_LEVEL
+  onEvent() {
+    this.clockTime -= 1; // One second
+    if (this.clockTime <= 0) {
+      for (let column of this.columns) {
+        // handle earthquakes
+        // column.earthquake();
       }
-      this.clock.setText(this.clockTime.toString());
+      this.clockTime = C.TIME_PER_LEVEL;
+    }
+    this.clock.setText(this.clockTime.toString());
   }
 
-  addRackTile(i: number): string{
-    return 'X'
+  addRackTile(i: number): string {
+    return "X";
   }
 }
 
@@ -66,7 +84,5 @@ const config = {
   height: 600,
   scene: Game,
 };
-
-
 
 const game = new Phaser.Game(config);
