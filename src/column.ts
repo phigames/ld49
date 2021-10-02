@@ -6,7 +6,7 @@ export default class Column extends Phaser.GameObjects.Container {
   draggingTile: Tile | null;
   dictionary: Dictionary;
   button: Phaser.GameObjects.Image;
-  buttonAddsTile: Function | null;
+  buttonAddsTile: Function;
   isWord: boolean;
 
   constructor(
@@ -25,13 +25,14 @@ export default class Column extends Phaser.GameObjects.Container {
     this.add(new Phaser.GameObjects.Image(this.scene, 0, -65, "column"));
 
     letters.forEach((l, i) => {
-      let tile = new Tile(scene, l, -1, 0);
+      let tile = new Tile(scene, l, 0, 0);
       this.addTile(tile);
     });
 
     this.button = new Phaser.GameObjects.Image(this.scene, 0, 100, "letter-X");
     this.add(this.button);
     this.button.setInteractive();
+    this.hideButton();
     this.buttonAddsTile = buttonAddsTile;
     this.button.on("pointerup", this.buttonAddsTile);
   }
@@ -85,6 +86,7 @@ export default class Column extends Phaser.GameObjects.Container {
     let nextTileY = 87 - distance * this.tiles.length;
     for (const tile of this.tiles) {
       if (tile !== excludeTile) {
+        tile.x = -1;
         if (tile.y !== nextTileY) {
           if (animate) {
             if (!this.scene.tweens.isTweening(tile)) {

@@ -36,7 +36,15 @@ export default class Game extends Phaser.Scene {
     const data = this.cache.json.get("wordList");
     this.dictionary = new Dictionary(data);
 
-    this.rack = new Rack(this);
+    this.rack = new Rack(this, () => {
+      for (const column of this.columns) {
+        if (this.rack.activeLetter !== null) {
+        column.showButton();
+        } else {
+          column.hideButton();
+        }
+      }
+    });
     this.add.existing(this.rack);
     this.columns = [];
     for (let i = 0; i < 6; i++) {
@@ -109,13 +117,12 @@ export default class Game extends Phaser.Scene {
   }
 
   addRackTile(i: number) {
-    if (this.rack.activeLetter >= 0) {
-      console.log("add tile from rack");
+    if (this.rack.activeLetter !== null) {
       // index of currently selected tile
       const index = this.rack.activeLetter;
       // letter of currently selected tile
       const letter = this.rack.tiles[index].letter;
-      let tile = new Tile(this, letter, i * 70, 5 * 40);
+      let tile = new Tile(this, letter, 0, 0);
       this.columns[i].addTile(tile);
       this.rack.removeTile(index);
     }

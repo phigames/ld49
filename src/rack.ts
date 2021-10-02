@@ -5,11 +5,13 @@ export default class Rack extends Phaser.GameObjects.Container {
   tiles: Tile[];
   letters: string[];
   activeLetter: number | null;
+  updateColumnButtons: Function;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene, updateColumnButtons: Function) {
     super(scene, 320, 400);
 
     this.tiles = [];
+    this.updateColumnButtons = updateColumnButtons;
     this.fill();
   }
 
@@ -26,7 +28,6 @@ export default class Rack extends Phaser.GameObjects.Container {
       return false;
     } else {
       const newTile = new Tile(this.scene, letter, 0, 0);
-      newTile.index = this.tiles.length;
       this.tiles.push(newTile);
       this.add(newTile);
       this.updateTileCoords();
@@ -36,6 +37,7 @@ export default class Rack extends Phaser.GameObjects.Container {
         "pointerup",
         () => {
           this.activeLetter = this.tiles.indexOf(newTile);
+          this.updateColumnButtons();
         },
         this
       );
@@ -51,6 +53,7 @@ export default class Rack extends Phaser.GameObjects.Container {
     this.updateTileCoords();
     console.log("tile removed");
     this.activeLetter = null;
+    this.updateColumnButtons();
   }
 
   fill() {
