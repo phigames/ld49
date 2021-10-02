@@ -1,5 +1,6 @@
 import "phaser";
 import * as C from "./constants";
+import { Dictionary } from "./dictionary";
 
 export default class Game extends Phaser.Scene {
   tiles: Tile[];
@@ -12,12 +13,15 @@ export default class Game extends Phaser.Scene {
     for (const letter of C.LETTERS) {
       this.load.image(`assets/letter-${letter}`);
     }
+    this.load.json("wordList", "assets/words.json");
   }
 
   create() {
     for (const letter of this.tiles) {
       this.add.existing(letter);
     }
+    const data = this.cache.json.get("wordList");
+    const word_dict = new Dictionary(data);
   }
 }
 
