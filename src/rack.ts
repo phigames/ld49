@@ -3,6 +3,7 @@ import Tile from "./tile";
 export default class Rack extends Phaser.GameObjects.Container {
   tiles: Tile[];
   letters: string[];
+  activeLetter: number;
 
   constructor(scene: Phaser.Scene) {
     super(scene, 400, 500);
@@ -10,12 +11,19 @@ export default class Rack extends Phaser.GameObjects.Container {
     this.tiles = [];
     this.letters = ["C", "L", "M", "A", "C", "H", "T", "S"];
     let nextTileX = -142;
-    for (const value of this.letters) {
-      const tile = new Tile(scene, value, nextTileX, 0);
+    this.letters.forEach((l, i) => {
+      const tile = new Tile(scene, l, nextTileX, 0);
       this.tiles.push(tile);
       this.add(tile);
+      tile.on(
+        "pointerup",
+        () => {
+          this.activeLetter = i;
+        },
+        this
+      );
       nextTileX = nextTileX + 36;
-    }
+    });
   }
 
   addTile(letter: string) {
@@ -27,13 +35,13 @@ export default class Rack extends Phaser.GameObjects.Container {
       const newTile = new Tile(this.scene, letter, newTileX, 0);
       this.tiles.push(newTile);
       this.add(newTile);
-      return true
+      return true;
     }
   }
 
   removeTile(i: integer) {
     // Remove one element at index
-    this.tiles.splice(i, 1)
-    this.remove(this.tiles[i])
+    this.tiles.splice(i, 1);
+    this.remove(this.tiles[i]);
   }
 }
