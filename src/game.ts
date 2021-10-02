@@ -39,7 +39,7 @@ export default class Game extends Phaser.Scene {
     this.rack = new Rack(this, () => {
       for (const column of this.columns) {
         if (this.rack.activeLetter !== null) {
-        column.showButton();
+          column.showButton();
         } else {
           column.hideButton();
         }
