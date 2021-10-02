@@ -4,7 +4,7 @@ import * as C from "./constants";
 export default class Rack extends Phaser.GameObjects.Container {
   tiles: Tile[];
   letters: string[];
-  activeLetter: number;
+  activeLetter: number | null;
 
   constructor(scene: Phaser.Scene) {
     super(scene, 320, 400);
@@ -17,6 +17,7 @@ export default class Rack extends Phaser.GameObjects.Container {
     let nextTileX = -142;
     for (let tile of this.tiles) {
       tile.x = nextTileX;
+      // 4 buffer plus tile size (32) + buffer (4) for each tile
       nextTileX = nextTileX + 36;
     }
   }
@@ -25,22 +26,20 @@ export default class Rack extends Phaser.GameObjects.Container {
     if (this.tiles.length >= 8) {
       return false;
     } else {
-      // 4 buffer plus tile size (32) + buffer (4) for each tile
-      let newTileX = 4 + this.tiles.length * (32 + 4);
-      const newTile = new Tile(this.scene, letter, newTileX, 0);
+      const newTile = new Tile(this.scene, letter, 0, 0);
       newTile.index = this.tiles.length;
       this.tiles.push(newTile);
       this.add(newTile);
+      this.updateTileCoords();
 
       // Add event listener
       newTile.on(
         "pointerup",
         () => {
-          this.activeLetter = newTile.index;
+          this.activeLetter = this.tiles.indexOf(newTile);
         },
         this
       );
-      this.updateTileCoords();
       return true;
     }
   }
@@ -51,6 +50,8 @@ export default class Rack extends Phaser.GameObjects.Container {
     this.tiles[i].destroy();
     this.tiles.splice(i, 1);
     this.updateTileCoords();
+    console.log("tile removed");
+    this.activeLetter = null;
   }
 
   fill() {

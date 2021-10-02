@@ -40,7 +40,7 @@ export default class Game extends Phaser.Scene {
       this.addColumn(i);
     }
     this.clockTime = C.TIME_PER_LEVEL;
-    this.clock = this.add.text(700, 32, this.clockTime.toString());
+    this.clock = this.add.text(600, 32, this.clockTime.toString());
     const timedEvent = this.time.addEvent({
       delay: 1000,
       callback: this.onEvent,
@@ -97,23 +97,28 @@ export default class Game extends Phaser.Scene {
     this.clock.setText(this.clockTime.toString());
   }
 
-  addRackTile(i: number): string {
-    return "X";
-  }
-
   addColumn(i: number) {
-    const column = new Column(
-      this,
-      i,
-      ["A", "B", "C"],
-      this.dictionary,
-      () => {}
+    const column = new Column(this, i, ["A", "B", "C"], this.dictionary, () =>
+      this.addRackTile(i)
     );
     this.columns.splice(i, 0, column);
     this.add.existing(column);
     column.addNewButton();
     if (i == 0) {
       column.removeButton();
+    }
+  }
+
+  addRackTile(i: number) {
+    if (this.rack.activeLetter >= 0) {
+      console.log("add tile from rack");
+      // index of currently selected tile
+      const index = this.rack.activeLetter;
+      // letter of currently selected tile
+      const letter = this.rack.tiles[index].letter;
+      let tile = new Tile(this, letter, i * 70, 5 * 40);
+      this.columns[i].addTile(tile);
+      this.rack.removeTile(index);
     }
   }
 }
