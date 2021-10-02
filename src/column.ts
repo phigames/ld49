@@ -1,9 +1,15 @@
 import { Dictionary } from "./dictionary";
+import * as C from "./constants";
 import Tile from "./tile";
 
 export default class Column extends Phaser.GameObjects.Container {
   tiles: Tile[];
+  draggingTile: Tile | null;
+  dragStartX: number;
+  dragStartY: number;
   dictionary: Dictionary;
+  button: Phaser.GameObjects.Image | null;
+  buttonAddsTile: Function | null;
   isWord: boolean;
 
   constructor(
@@ -11,21 +17,38 @@ export default class Column extends Phaser.GameObjects.Container {
     index: number,
     letters: string[],
     dictionary: Dictionary,
-    callback
+    buttonAddsTile
   ) {
     super(scene, index * 70, 20);
     this.tiles = [];
+    this.draggingTile = null;
     this.isWord = false;
     this.dictionary = dictionary;
     letters.forEach((l, i) => {
       let tile = new Tile(scene, l, index * 70, i * 40);
       this.addTile(tile);
     });
-
-    this.on("pointerup", callback);
+    this.button = null;
+    this.buttonAddsTile = buttonAddsTile;
   }
 
   addTile(tile: Tile) {
+    tile.removeAllListeners();
+    tile.setInteractive();
+    this.scene.input.setDraggable(tile);
+    tile.on("dragstart", (pointer: Phaser.Input.Pointer) => {
+      this.draggingTile = tile;
+    });
+    tile.on(
+      "drag",
+      (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+        tile.x = dragX;
+        tile.y = dragY;
+      }
+    );
+    tile.on("dragend", (pointer: Phaser.Input.Pointer) => {
+      this.draggingTile = null;
+    });
     this.tiles.push(tile);
     this.add(tile);
     this.checkCorrectWord();
@@ -38,12 +61,21 @@ export default class Column extends Phaser.GameObjects.Container {
   }
 
   addNewButton() {
-    this.add(
-      new Phaser.GameObjects.Image(this.scene, this.x, this.y + 120, `letter-X`)
+    let button = new Phaser.GameObjects.Image(
+      this.scene,
+      this.x,
+      this.y + 120,
+      `letter-X`
     );
+    this.button = button;
+    this.add(button);
+    this.button.setInteractive();
+    this.button.on("pointerup", this.buttonAddsTile);
   }
 
-  removeButton() {}
+  removeButton() {
+    this.button = null;
+  }
 
   getWordString() {
     let word = "";

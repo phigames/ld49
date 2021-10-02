@@ -3,6 +3,7 @@ import Column from "./column";
 import * as C from "./constants";
 import { Dictionary } from "./dictionary";
 import Rack from "./rack";
+import Tile from "./tile";
 
 export default class Game extends Phaser.Scene {
   rack: Rack;
@@ -38,7 +39,6 @@ export default class Game extends Phaser.Scene {
     for (let i = 0; i < 6; i++) {
       this.addColumn(i);
     }
-    this.columns[0].addNewButton();
     this.clockTime = C.TIME_PER_LEVEL;
     this.clock = this.add.text(700, 32, this.clockTime.toString());
     const timedEvent = this.time.addEvent({
@@ -47,6 +47,21 @@ export default class Game extends Phaser.Scene {
       callbackScope: this,
       loop: true,
     });
+
+    this.input.keyboard.on(
+      "keydown-R",
+      function () {
+        this.rack.removeTile(0);
+      },
+      this
+    );
+    this.input.keyboard.on(
+      "keydown-A",
+      function () {
+        console.log(this.rack.addTile("F"));
+      },
+      this
+    );
   }
 
   onEvent() {
@@ -88,6 +103,10 @@ export default class Game extends Phaser.Scene {
     );
     this.columns.splice(i, 0, column);
     this.add.existing(column);
+    column.addNewButton();
+    if (i == 0) {
+      column.removeButton();
+    }
   }
 }
 
