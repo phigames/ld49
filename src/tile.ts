@@ -1,4 +1,4 @@
-class Tile extends Phaser.GameObjects.Image {
+export default class Tile extends Phaser.GameObjects.Image {
   letter: string;
 
   constructor(scene: Phaser.Scene, letter: string) {

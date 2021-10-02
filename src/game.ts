@@ -1,9 +1,12 @@
 import "phaser";
+import Column from "./column";
 import * as C from "./constants";
 import { Dictionary } from "./dictionary";
+import Rack from "./rack";
 
 export default class Game extends Phaser.Scene {
-  tiles: Tile[];
+  rack: Rack;
+  columns: Column[];
 
   constructor() {
     super("game");
@@ -17,11 +20,17 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    for (const letter of this.tiles) {
-      this.add.existing(letter);
-    }
     const data = this.cache.json.get("wordList");
     const word_dict = new Dictionary(data);
+
+    this.rack = new Rack(this, ["D", "E", "F"]);
+    this.add.existing(this.rack);
+    this.columns = [];
+    for (let i = 0; i < 5; i++) {
+      const column = new Column(this, i, ["A", "B", "C"]);
+      this.columns.push(column);
+      this.add.existing(column);
+    }
   }
 }
 
