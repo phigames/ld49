@@ -29,10 +29,11 @@ export default class Game extends Phaser.Scene {
     this.add.existing(this.rack);
     this.columns = [];
     for (let i = 0; i < 6; i++) {
-      const column = new Column(this, i, ["A", "B", "C"]);
+      const column = new Column(this, i, ["A", "B", "C"], word_dict, ()=>{});
       this.columns.push(column);
       this.add.existing(column);
     }
+    this.columns[0].isCorrectWord()
     this.columns[0].addNewButton()
     this.clockTime = C.TIME_PER_LEVEL
     this.clock = this.add.text(700, 32, this.clockTime.toString());  
