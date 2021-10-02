@@ -16,14 +16,22 @@ export default class Column extends Phaser.GameObjects.Container {
     this.tiles = [];
     this.dictionary = dictionary;
     letters.forEach((l, i) => {
-      this.tiles.push(new Tile(scene, l, index * 70, i * 40));
+      let tile = new Tile(scene, l, index * 70, i * 40)
+      this.addTile(tile)
     });
-    for (let tile of this.tiles) {
-      this.add(tile);
-    }
+    
     this.on("pointerup", callback);
   }
 
+  addTile(tile: Tile){
+    this.tiles.push(tile);
+    this.add(tile)
+  }
+
+  removeTile(index: number){
+    this.tiles.splice(index, 1)
+  }
+  
   addNewButton() {
     this.add(
       new Phaser.GameObjects.Image(this.scene, this.x, this.y + 120, `letter-X`)

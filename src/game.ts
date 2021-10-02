@@ -53,6 +53,10 @@ export default class Game extends Phaser.Scene {
       }
       this.clock.setText(this.clockTime.toString());
   }
+
+  addRackTile(i: number): string{
+    return 'X'
+  }
 }
 
 const config = {
@@ -62,5 +66,7 @@ const config = {
   height: 600,
   scene: Game,
 };
+
+
 
 const game = new Phaser.Game(config);
