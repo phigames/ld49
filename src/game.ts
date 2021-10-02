@@ -7,6 +7,8 @@ import Rack from "./rack";
 export default class Game extends Phaser.Scene {
   rack: Rack;
   columns: Column[];
+  clock: Phaser.GameObjects.Text;
+  clockTime: number
 
   constructor() {
     super("game");
@@ -32,6 +34,23 @@ export default class Game extends Phaser.Scene {
       this.add.existing(column);
     }
     this.columns[0].addNewButton()
+    this.clockTime = C.TIME_PER_LEVEL
+    this.clock = this.add.text(700, 32, this.clockTime.toString());  
+    const timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
+
+  }
+
+  onEvent()
+  {
+      this.clockTime -= 1; // One second
+      if (this.clockTime <= 0) {
+        for (let column of this.columns) {
+          // handle earthquakes
+          // column.earthquake();
+        }
+        this.clockTime = C.TIME_PER_LEVEL
+      }
+      this.clock.setText(this.clockTime.toString());
   }
 }
 
