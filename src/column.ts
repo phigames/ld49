@@ -15,28 +15,28 @@ export default class Column extends Phaser.GameObjects.Container {
   ) {
     super(scene, index * 70, 20);
     this.tiles = [];
-    this.isWord = false
+    this.isWord = false;
     this.dictionary = dictionary;
     letters.forEach((l, i) => {
-      let tile = new Tile(scene, l, index * 70, i * 40)
-      this.addTile(tile)
+      let tile = new Tile(scene, l, index * 70, i * 40);
+      this.addTile(tile);
     });
-    
+
     this.on("pointerup", callback);
   }
 
-  addTile(tile: Tile){
+  addTile(tile: Tile) {
     this.tiles.push(tile);
-    this.add(tile)
-    this.checkCorrectWord()
+    this.add(tile);
+    this.checkCorrectWord();
   }
 
-  removeTile(index: number){
-    this.remove(this.tiles[index])
-    this.tiles.splice(index, 1)
-    this.checkCorrectWord()
+  removeTile(index: number) {
+    this.remove(this.tiles[index]);
+    this.tiles.splice(index, 1);
+    this.checkCorrectWord();
   }
-  
+
   addNewButton() {
     this.add(
       new Phaser.GameObjects.Image(this.scene, this.x, this.y + 120, `letter-X`)
@@ -55,17 +55,5 @@ export default class Column extends Phaser.GameObjects.Container {
 
   checkCorrectWord() {
     this.isWord = this.dictionary.wordInDict(this.getWordString());
-  }
-
-  onEarthquake() {
-    const randomIndex = Math.floor(Math.random() * (this.tiles.length + 1))
-    if (this.isWord) {
-      this.removeTile(randomIndex)
-    } else {
-      // TODO Animation for Earthquake Tiles
-      this.remove(this.tiles)
-      this.tiles = []
-    }
-
   }
 }

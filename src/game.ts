@@ -8,7 +8,8 @@ export default class Game extends Phaser.Scene {
   rack: Rack;
   columns: Column[];
   clock: Phaser.GameObjects.Text;
-  clockTime: number
+  clockTime: number;
+  dictionary: Dictionary;
 
   constructor() {
     super("game");
@@ -29,36 +30,64 @@ export default class Game extends Phaser.Scene {
       "background"
     );
     const data = this.cache.json.get("wordList");
-    const word_dict = new Dictionary(data);
+    this.dictionary = new Dictionary(data);
 
     this.rack = new Rack(this);
     this.add.existing(this.rack);
     this.columns = [];
     for (let i = 0; i < 6; i++) {
-      const column = new Column(this, i, ["A", "B", "C"], word_dict, ()=>{});
-      this.columns.push(column);
-      this.add.existing(column);
+      this.addColumn(i);
     }
-    this.columns[0].addNewButton()
-    this.clockTime = C.TIME_PER_LEVEL
-    this.clock = this.add.text(700, 32, this.clockTime.toString());  
-    const timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
+    this.columns[0].addNewButton();
+    this.clockTime = C.TIME_PER_LEVEL;
+    this.clock = this.add.text(700, 32, this.clockTime.toString());
+    const timedEvent = this.time.addEvent({
+      delay: 1000,
+      callback: this.onEvent,
+      callbackScope: this,
+      loop: true,
+    });
   }
 
-  onEvent()
-  {
-      this.clockTime -= 1; // One second
-      if (this.clockTime <= 0) {
-        for (let column of this.columns) {
-          column.onEarthquake();
+  onEvent() {
+    this.clockTime -= 1; // One second
+    if (this.clockTime <= 0) {
+      for (let i = 0; i < this.columns.length; i++) {
+        const column = this.columns[i];
+        const randomIndex = Math.floor(
+          Math.random() * (column.tiles.length + 1)
+        );
+        if (column.isWord) {
+          column.removeTile(randomIndex);
+        } else {
+          // TODO Animation for Earthquake Tiles
+          for (const tile of column.tiles) {
+            tile.destroy();
+          }
+          this.columns.splice(i, 1);
+          this.addColumn(i);
+          column.destroy(true);
         }
-        this.clockTime = C.TIME_PER_LEVEL
       }
-      this.clock.setText(this.clockTime.toString());
+      this.clockTime = C.TIME_PER_LEVEL;
+    }
+    this.clock.setText(this.clockTime.toString());
   }
 
-  addRackTile(i: number): string{
-    return 'X'
+  addRackTile(i: number): string {
+    return "X";
+  }
+
+  addColumn(i: number) {
+    const column = new Column(
+      this,
+      i,
+      ["A", "B", "C"],
+      this.dictionary,
+      () => {}
+    );
+    this.columns.splice(i, 0, column);
+    this.add.existing(column);
   }
 }
 
