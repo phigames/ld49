@@ -40,7 +40,7 @@ export default class Game extends Phaser.Scene {
       this.addColumn(i);
     }
     this.clockTime = C.TIME_PER_LEVEL;
-    this.clock = this.add.text(700, 32, this.clockTime.toString());
+    this.clock = this.add.text(600, 32, this.clockTime.toString());
     const timedEvent = this.time.addEvent({
       delay: 1000,
       callback: this.onEvent,
