@@ -5,7 +5,7 @@ export default class Rack extends Phaser.GameObjects.Container {
   letters: string[];
 
   constructor(scene: Phaser.Scene) {
-    super(scene, 400, 500);
+    super(scene, 320, 400);
 
     this.tiles = [];
     this.letters = ["C", "L", "M", "A", "C", "H", "T", "S"];

@@ -19,9 +19,15 @@ export default class Game extends Phaser.Scene {
       this.load.image(`letter-${letter}`, `assets/letter-${letter}.png`);
     }
     this.load.json("wordList", "assets/words.json");
+    this.load.image("background", "assets/background.png");
   }
 
   create() {
+    let background = this.add.image(
+      C.SCREEN_WIDTH / 2,
+      C.SCREEN_HEIGHT / 2,
+      "background"
+    );
     const data = this.cache.json.get("wordList");
     const word_dict = new Dictionary(data);
 
@@ -63,7 +69,5 @@ const config = {
   height: C.SCREEN_HEIGHT,
   scene: Game,
 };
-
-
 
 const game = new Phaser.Game(config);
