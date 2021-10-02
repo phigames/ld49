@@ -23,7 +23,7 @@ export default class Game extends Phaser.Scene {
     const data = this.cache.json.get("wordList");
     const word_dict = new Dictionary(data);
 
-    this.rack = new Rack(this, ["D", "E", "F"]);
+    this.rack = new Rack(this);
     this.add.existing(this.rack);
     this.columns = [];
     for (let i = 0; i < 5; i++) {
