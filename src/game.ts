@@ -40,7 +40,6 @@ export default class Game extends Phaser.Scene {
         column.removeButton();
       }
     }
-    this.columns[0].isCorrectWord();
     this.clockTime = C.TIME_PER_LEVEL;
     this.clock = this.add.text(700, 32, this.clockTime.toString());
     const timedEvent = this.time.addEvent({
@@ -55,11 +54,11 @@ export default class Game extends Phaser.Scene {
     this.clockTime -= 1; // One second
     if (this.clockTime <= 0) {
       for (let column of this.columns) {
-        // handle earthquakes
-        // column.earthquake();
+        column.onEarthquake();
       }
       this.clockTime = C.TIME_PER_LEVEL;
     }
+
     this.clock.setText(this.clockTime.toString());
   }
 
@@ -72,8 +71,8 @@ export default class Game extends Phaser.Scene {
 const config = {
   type: Phaser.AUTO,
   backgroundColor: "#125555",
-  width: 800,
-  height: 600,
+  width: C.SCREEN_WIDTH,
+  height: C.SCREEN_HEIGHT,
   scene: Game,
 };
 
