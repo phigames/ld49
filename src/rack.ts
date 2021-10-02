@@ -1,4 +1,5 @@
 import Tile from "./tile";
+import * as C from "./constants";
 
 export default class Rack extends Phaser.GameObjects.Container {
   tiles: Tile[];
@@ -9,10 +10,7 @@ export default class Rack extends Phaser.GameObjects.Container {
     super(scene, 320, 400);
 
     this.tiles = [];
-    this.letters = ["C", "L", "M", "A", "C", "H", "T", "S"];
-    for (const letter of this.letters) {
-      this.addTile(letter);
-    }
+    this.fill();
   }
 
   updateTileCoords() {
@@ -55,17 +53,37 @@ export default class Rack extends Phaser.GameObjects.Container {
     this.updateTileCoords();
   }
 
-  // refill() {
-  //   const nOfTiles = 8 - this.tiles.length;
-  //   do {
-  //     for (let i = 0; i < nOfTiles; i++) {
-  //       // body
-  //     }
-  //   } while (condition);
-  // }
+  fill() {
+    // Fill rack with random letter tiles, ensuring at least one vowel
+    const nOfTiles = 8 - this.tiles.length;
 
-  // vowelInTiles() {
-  //   // Checks if there is a vowel tile in current tile list
+    for (let i = 0; i < nOfTiles; i++) {
+      const randomIndex = Math.floor(Math.random() * C.LETTERS.length);
+      const randomLetter = C.LETTERS[randomIndex];
+      this.addTile(randomLetter);
+    }
 
-  // }
+    while (!this.vowelInTiles()) {
+      // Remove the elements we just added
+      for (let i = 7; i > nOfTiles - 1; i--) {
+        this.removeTile(i);
+      }
+      // Call fill again
+      this.fill();
+    }
+  }
+
+  vowelInTiles() {
+    // Returns true if tiles contain any vowel, false otherwise
+    const vowels = "AEIOU";
+    let vowelInTiles = false;
+    for (let tile of this.tiles) {
+      // If letter is in vowel string
+      if (vowels.indexOf(tile.letter) != -1) {
+        vowelInTiles = true;
+      }
+    }
+    console.log("Vowel in tiles: " + vowelInTiles);
+    return vowelInTiles;
+  }
 }
