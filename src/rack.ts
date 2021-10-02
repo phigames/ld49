@@ -27,6 +27,13 @@ export default class Rack extends Phaser.GameObjects.Container {
       const newTile = new Tile(this.scene, letter, newTileX, 0);
       this.tiles.push(newTile);
       this.add(newTile);
+      return true
     }
+  }
+
+  removeTile(i: integer) {
+    // Remove one element at index
+    this.tiles.splice(i, 1)
+    this.remove(this.tiles[i])
   }
 }
