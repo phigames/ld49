@@ -19,6 +19,7 @@ export default class Rack extends Phaser.GameObjects.Container {
     let nextTileX = -142;
     for (let tile of this.tiles) {
       tile.x = nextTileX;
+      // 4 buffer plus tile size (32) + buffer (4) for each tile
       nextTileX = nextTileX + 36;
     }
   }
@@ -27,12 +28,11 @@ export default class Rack extends Phaser.GameObjects.Container {
     if (this.tiles.length >= 8) {
       return false;
     } else {
-      // 4 buffer plus tile size (32) + buffer (4) for each tile
-      let newTileX = 4 + this.tiles.length * (32 + 4);
-      const newTile = new Tile(this.scene, letter, newTileX, 0);
+      const newTile = new Tile(this.scene, letter, 0, 0);
       newTile.index = this.tiles.length;
       this.tiles.push(newTile);
       this.add(newTile);
+      this.updateTileCoords();
 
       // Add event listener
       newTile.on(
@@ -42,7 +42,6 @@ export default class Rack extends Phaser.GameObjects.Container {
         },
         this
       );
-      this.updateTileCoords();
       return true;
     }
   }
