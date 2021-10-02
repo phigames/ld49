@@ -3,7 +3,7 @@ import Tile from "./tile";
 export default class Rack extends Phaser.GameObjects.Container {
   tiles: Tile[];
   letters: string[];
-  activeLetter: number;
+  activeLetter: number | null;
 
   constructor(scene: Phaser.Scene) {
     super(scene, 320, 400);
@@ -38,7 +38,7 @@ export default class Rack extends Phaser.GameObjects.Container {
       newTile.on(
         "pointerup",
         () => {
-          this.activeLetter = newTile.index;
+          this.activeLetter = this.tiles.indexOf(newTile);
         },
         this
       );
@@ -53,19 +53,17 @@ export default class Rack extends Phaser.GameObjects.Container {
     this.tiles[i].destroy();
     this.tiles.splice(i, 1);
     this.updateTileCoords();
+    console.log("tile removed");
+    this.activeLetter = null;
   }
 
-  // refill() {
-  //   const nOfTiles = 8 - this.tiles.length;
-  //   do {
-  //     for (let i = 0; i < nOfTiles; i++) {
-  //       // body
-  //     }
-  //   } while (condition);
-  // }
-
-  // vowelInTiles() {
-  //   // Checks if there is a vowel tile in current tile list
-
-  // }
+  /*   refill() {
+    const nOfTiles = 8 - this.tiles.length;
+    do {
+      // loop body
+      for (let i = 0; i < nOfTiles; i++) {
+        // body
+      }
+    } while (condition);
+  } */
 }
