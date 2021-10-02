@@ -7,7 +7,7 @@ export default class Column extends Phaser.GameObjects.Container {
     super(scene, index * 70, 20);
     this.tiles = [];
     letters.forEach((l, i) => {
-      this.tiles.push(new Tile(scene, l, index * 70, i * 40));
+      let tile = new Tile(scene, l, index * 70, i * 40)
     });
     for (let tile of this.tiles){
       this.add(tile)
@@ -15,8 +15,15 @@ export default class Column extends Phaser.GameObjects.Container {
     this.on('pointerup', callback)
   }
 
+  addTile(tile: Tile){
+    this.tiles.push();
+    this.add(tile)
+  }
 
-
+  removeTile(index: number){
+    this.tiles.splice(index, 1)
+  }
+  
   addNewButton() {
     this.add(new Phaser.GameObjects.Image(this.scene, this.x , this.y + 120, `letter-X`));
   }
