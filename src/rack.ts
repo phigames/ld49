@@ -55,13 +55,17 @@ export default class Rack extends Phaser.GameObjects.Container {
     this.updateTileCoords();
   }
 
-  refill() {
-    const nOfTiles = 8 - this.tiles.length;
-    do {
-      // loop body
-      for (let i = 0; i < nOfTiles; i++) {
-        // body
-      }
-    } while (condition);
-  }
+  // refill() {
+  //   const nOfTiles = 8 - this.tiles.length;
+  //   do {
+  //     for (let i = 0; i < nOfTiles; i++) {
+  //       // body
+  //     }
+  //   } while (condition);
+  // }
+
+  // vowelInTiles() {
+  //   // Checks if there is a vowel tile in current tile list
+
+  // }
 }
