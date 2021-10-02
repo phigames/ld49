@@ -78,7 +78,10 @@ export default class Game extends Phaser.Scene {
   }
 
   addRackTile(i: number) {
-    let tile = new Tile(this, "X", i * 70, 5 * 40);
+    console.log("add tile from rack");
+    // letter of currently selected tile
+    const letter = this.rack.tiles[this.rack.activeLetter].letter;
+    let tile = new Tile(this, letter, i * 70, 5 * 40);
     this.columns[i].addTile(tile);
   }
 }

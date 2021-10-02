@@ -30,6 +30,7 @@ export default class Rack extends Phaser.GameObjects.Container {
       // 4 buffer plus tile size (32) + buffer (4) for each tile
       let newTileX = 4 + this.tiles.length * (32 + 4);
       const newTile = new Tile(this.scene, letter, newTileX, 0);
+      newTile.index = this.tiles.length;
       this.tiles.push(newTile);
       this.add(newTile);
 
@@ -37,8 +38,7 @@ export default class Rack extends Phaser.GameObjects.Container {
       newTile.on(
         "pointerup",
         () => {
-          this.activeLetter = this.tiles.length - 1;
-          console.log(letter + " added");
+          this.activeLetter = newTile.index;
         },
         this
       );
