@@ -14,7 +14,7 @@ export default class Game extends Phaser.Scene {
 
   preload() {
     for (const letter of C.LETTERS) {
-      this.load.image(`assets/letter-${letter}`);
+      this.load.image(`letter-${letter}`, `assets/letter-${letter}.png`);
     }
     this.load.json("wordList", "assets/words.json");
   }
