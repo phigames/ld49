@@ -9,31 +9,46 @@ export default class Rack extends Phaser.GameObjects.Container {
 
     this.tiles = [];
     this.letters = ["C", "L", "M", "A", "C", "H", "T", "S"];
+    for (const letter of this.letters) {
+      this.addTile(letter);
+    }
+  }
+
+  updateTileCoords() {
     let nextTileX = -142;
-    for (const value of this.letters) {
-      const tile = new Tile(scene, value, nextTileX, 0);
-      this.tiles.push(tile);
-      this.add(tile);
+    for (let tile of this.tiles) {
+      tile.x = nextTileX;
       nextTileX = nextTileX + 36;
     }
   }
 
   addTile(letter: string) {
-    if (this.letters.length >= 8) {
+    if (this.tiles.length >= 8) {
       return false;
     } else {
       // 4 buffer plus tile size (32) + buffer (4) for each tile
-      let newTileX = 4 + this.letters.length * (32 + 4);
+      let newTileX = 4 + this.tiles.length * (32 + 4);
       const newTile = new Tile(this.scene, letter, newTileX, 0);
       this.tiles.push(newTile);
       this.add(newTile);
-      return true
+      this.updateTileCoords();
+      return true;
     }
   }
 
   removeTile(i: integer) {
     // Remove one element at index
-    this.tiles.splice(i, 1)
-    this.remove(this.tiles[i])
+    this.remove(this.tiles[i]);
+    this.tiles[i].destroy();
+    this.tiles.splice(i, 1);
+    this.updateTileCoords();
   }
+
+  // refill() {
+  //   const nOfTiles = 8 - this.tiles.length()
+  //   for (let index = 0; index < array.length; index++) {
+  //     const element = array[index];
+
+  //   }
+  // }
 }
