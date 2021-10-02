@@ -51,6 +51,7 @@ export default class Game extends Phaser.Scene {
       loop: true,
     });
 
+    // Test functions for removing/adding rack tiles (hehe)
     this.input.keyboard.on(
       "keydown-R",
       function () {
@@ -59,9 +60,16 @@ export default class Game extends Phaser.Scene {
       this
     );
     this.input.keyboard.on(
-      "keydown-A",
+      "keydown-F",
       function () {
         console.log(this.rack.addTile("F"));
+      },
+      this
+    );
+    this.input.keyboard.on(
+      "keydown-A",
+      function () {
+        this.rack.fill();
       },
       this
     );
@@ -92,20 +100,25 @@ export default class Game extends Phaser.Scene {
     this.clock.setText(this.clockTime.toString());
   }
 
-  addRackTile(i: number): string {
-    return "X";
-  }
-
   addColumn(i: number) {
-    const column = new Column(
-      this,
-      i,
-      ["A", "B", "C"],
-      this.dictionary,
-      () => {}
+    const column = new Column(this, i, ["A", "B", "C"], this.dictionary, () =>
+      this.addRackTile(i)
     );
     this.columns.splice(i, 0, column);
     this.add.existing(column);
+  }
+
+  addRackTile(i: number) {
+    if (this.rack.activeLetter >= 0) {
+      console.log("add tile from rack");
+      // index of currently selected tile
+      const index = this.rack.activeLetter;
+      // letter of currently selected tile
+      const letter = this.rack.tiles[index].letter;
+      let tile = new Tile(this, letter, i * 70, 5 * 40);
+      this.columns[i].addTile(tile);
+      this.rack.removeTile(index);
+    }
   }
 }
 
