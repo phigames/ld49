@@ -33,7 +33,6 @@ export default class Game extends Phaser.Scene {
       this.columns.push(column);
       this.add.existing(column);
     }
-    this.columns[0].isCorrectWord()
     this.columns[0].addNewButton()
     this.clockTime = C.TIME_PER_LEVEL
     this.clock = this.add.text(700, 32, this.clockTime.toString());  
@@ -45,8 +44,7 @@ export default class Game extends Phaser.Scene {
       this.clockTime -= 1; // One second
       if (this.clockTime <= 0) {
         for (let column of this.columns) {
-          // handle earthquakes
-          // column.earthquake();
+          column.onEarthquake();
         }
         this.clockTime = C.TIME_PER_LEVEL
       }
