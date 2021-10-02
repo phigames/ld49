@@ -11,7 +11,3 @@ node_modules/
 
 # Build
 /npm-debug.log
-
-/dist/*
-!/dist/*.html
-!/dist/*.css
