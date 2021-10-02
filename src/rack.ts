@@ -9,12 +9,24 @@ export default class Rack extends Phaser.GameObjects.Container {
 
     this.tiles = [];
     this.letters = ["C", "L", "M", "A", "C", "H", "T", "S"];
-    let next_tile_x = -146;
+    let nextTileX = -142;
     for (const value of this.letters) {
-      const tile = new Tile(scene, value, next_tile_x, 0);
+      const tile = new Tile(scene, value, nextTileX, 0);
       this.tiles.push(tile);
       this.add(tile);
-      next_tile_x = next_tile_x + 36;
+      nextTileX = nextTileX + 36;
+    }
+  }
+
+  addTile(letter: string) {
+    if (this.letters.length >= 8) {
+      return false;
+    } else {
+      // 4 buffer plus tile size (32) + buffer (4) for each tile
+      let newTileX = 4 + this.letters.length * (32 + 4);
+      const newTile = new Tile(this.scene, letter, newTileX, 0);
+      this.tiles.push(newTile);
+      this.add(newTile);
     }
   }
 }
