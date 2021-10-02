@@ -88,15 +88,4 @@ export default class Column extends Phaser.GameObjects.Container {
   checkCorrectWord() {
     this.isWord = this.dictionary.wordInDict(this.getWordString());
   }
-
-  onEarthquake() {
-    const randomIndex = Math.floor(Math.random() * (this.tiles.length + 1));
-    if (this.isWord) {
-      this.removeTile(randomIndex);
-    } else {
-      // TODO Animation for Earthquake Tiles
-      this.remove(this.tiles);
-      this.tiles = [];
-    }
-  }
 }
