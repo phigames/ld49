@@ -48,6 +48,7 @@ export default class Game extends Phaser.Scene {
       loop: true,
     });
 
+    // Test functions for removing/adding rack tiles (hehe)
     this.input.keyboard.on(
       "keydown-R",
       function () {
@@ -56,9 +57,16 @@ export default class Game extends Phaser.Scene {
       this
     );
     this.input.keyboard.on(
-      "keydown-A",
+      "keydown-F",
       function () {
         console.log(this.rack.addTile("F"));
+      },
+      this
+    );
+    this.input.keyboard.on(
+      "keydown-A",
+      function () {
+        this.rack.fill();
       },
       this
     );
