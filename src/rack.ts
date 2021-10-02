@@ -55,11 +55,13 @@ export default class Rack extends Phaser.GameObjects.Container {
     this.updateTileCoords();
   }
 
-  // refill() {
-  //   const nOfTiles = 8 - this.tiles.length()
-  //   for (let index = 0; index < array.length; index++) {
-  //     const element = array[index];
-
-  //   }
-  // }
+  refill() {
+    const nOfTiles = 8 - this.tiles.length;
+    do {
+      // loop body
+      for (let i = 0; i < nOfTiles; i++) {
+        // body
+      }
+    } while (condition);
+  }
 }
