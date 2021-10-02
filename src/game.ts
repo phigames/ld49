@@ -1,4 +1,7 @@
 import "phaser";
+import { Dictionary } from "./dictionary";
+// import "./dictionary";
+// import { print_words } from "./dictionary";
 
 export default class Demo extends Phaser.Scene {
   constructor() {
@@ -10,6 +13,7 @@ export default class Demo extends Phaser.Scene {
     this.load.image("libs", "assets/libs.png");
     this.load.glsl("bundle", "assets/plasma-bundle.glsl.js");
     this.load.glsl("stars", "assets/starfields.glsl.js");
+    this.load.json("wordList", "assets/words.json");
   }
 
   create() {
@@ -20,6 +24,8 @@ export default class Demo extends Phaser.Scene {
     this.add.image(400, 300, "libs");
 
     const logo = this.add.image(400, 70, "logo");
+    const data = this.cache.json.get("wordList");
+    const word_dict = new Dictionary(data);
 
     this.tweens.add({
       targets: logo,
