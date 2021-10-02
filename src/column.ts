@@ -1,12 +1,11 @@
 import { Dictionary } from "./dictionary";
-import * as C from "./constants";
 import Tile from "./tile";
 
 export default class Column extends Phaser.GameObjects.Container {
   tiles: Tile[];
   draggingTile: Tile | null;
   dictionary: Dictionary;
-  button: Phaser.GameObjects.Image | null;
+  button: Phaser.GameObjects.Image;
   buttonAddsTile: Function | null;
   isWord: boolean;
 
@@ -17,22 +16,28 @@ export default class Column extends Phaser.GameObjects.Container {
     dictionary: Dictionary,
     buttonAddsTile
   ) {
-    super(scene, index * 140, 250);
+    super(scene, 70 + index * 100, 239);
     this.tiles = [];
     this.draggingTile = null;
     this.isWord = false;
     this.dictionary = dictionary;
+
+    this.add(new Phaser.GameObjects.Image(this.scene, 0, -65, "column"));
+
     letters.forEach((l, i) => {
-      let tile = new Tile(scene, l, 0, 0);
+      let tile = new Tile(scene, l, -1, 0);
       this.addTile(tile);
     });
-    this.button = null;
+
+    this.button = new Phaser.GameObjects.Image(this.scene, 0, 100, "letter-X");
+    this.add(this.button);
+    this.button.setInteractive();
     this.buttonAddsTile = buttonAddsTile;
+    this.button.on("pointerup", this.buttonAddsTile);
   }
 
   addTile(tile: Tile) {
     tile.removeAllListeners();
-    tile.setInteractive();
     this.tiles.push(tile);
     this.add(tile);
     this.updateTileCoords();
@@ -42,7 +47,7 @@ export default class Column extends Phaser.GameObjects.Container {
     tile.on("dragstart", () => {
       this.draggingTile = tile;
     });
-    tile.on("drag", (_: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+    tile.on("drag", (_, dragX: number, dragY: number) => {
       tile.y = dragY;
       const index = this.tiles.indexOf(tile);
       for (let i = 0; i < this.tiles.length; i++) {
@@ -76,8 +81,8 @@ export default class Column extends Phaser.GameObjects.Container {
   }
 
   updateTileCoords(animate: boolean = false, excludeTile?: Tile) {
-    const distance = 40;
-    let nextTileY = -distance * this.tiles.length;
+    const distance = 38;
+    let nextTileY = 87 - distance * this.tiles.length;
     for (const tile of this.tiles) {
       if (tile !== excludeTile) {
         if (tile.y !== nextTileY) {
@@ -89,8 +94,7 @@ export default class Column extends Phaser.GameObjects.Container {
                 props: { y: nextTileY },
                 duration: 100,
                 onComplete() {
-                  if (that.draggingTile === null)
-                  that.updateTileCoords();
+                  if (that.draggingTile === null) that.updateTileCoords();
                 },
               });
             }
@@ -103,21 +107,12 @@ export default class Column extends Phaser.GameObjects.Container {
     }
   }
 
-  addNewButton() {
-    let button = new Phaser.GameObjects.Image(
-      this.scene,
-      0,
-      this.tiles[this.tiles.length - 1].y + 40,
-      `letter-X`
-    );
-    this.button = button;
-    this.add(button);
-    this.button.setInteractive();
-    this.button.on("pointerup", this.buttonAddsTile);
+  showButton() {
+    this.button.setVisible(true);
   }
 
-  removeButton() {
-    this.button = null;
+  hideButton() {
+    this.button.setVisible(false);
   }
 
   getWordString() {

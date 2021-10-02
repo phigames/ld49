@@ -20,8 +20,11 @@ export default class Game extends Phaser.Scene {
     for (const letter of C.LETTERS) {
       this.load.image(`letter-${letter}`, `assets/letter-${letter}.png`);
     }
-    this.load.json("wordList", "assets/words.json");
     this.load.image("background", "assets/background.png");
+    this.load.image("column", "assets/column.png");
+    this.load.image("column-crumbly", "assets/column-crumbly.png");
+
+    this.load.json("wordList", "assets/words.json");
   }
 
   create() {
@@ -103,10 +106,6 @@ export default class Game extends Phaser.Scene {
     );
     this.columns.splice(i, 0, column);
     this.add.existing(column);
-    column.addNewButton();
-    if (i == 0) {
-      column.removeButton();
-    }
   }
 }
 

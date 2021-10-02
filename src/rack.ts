@@ -16,11 +16,10 @@ export default class Rack extends Phaser.GameObjects.Container {
   }
 
   updateTileCoords() {
-    let nextTileX = -142;
+    let nextTileX = -180;
     for (let tile of this.tiles) {
       tile.x = nextTileX;
-      // 4 buffer plus tile size (32) + buffer (4) for each tile
-      nextTileX = nextTileX + 36;
+      nextTileX = nextTileX + 50;
     }
   }
 
