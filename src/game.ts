@@ -26,11 +26,12 @@ export default class Game extends Phaser.Scene {
     this.rack = new Rack(this);
     this.add.existing(this.rack);
     this.columns = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 6; i++) {
       const column = new Column(this, i, ["A", "B", "C"]);
       this.columns.push(column);
       this.add.existing(column);
     }
+    this.columns[0].addNewButton()
   }
 }
 
