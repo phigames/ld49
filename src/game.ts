@@ -3,6 +3,7 @@ import Column from "./column";
 import * as C from "./constants";
 import { Dictionary } from "./dictionary";
 import Rack from "./rack";
+import Tile from "./tile";
 
 export default class Game extends Phaser.Scene {
   rack: Rack;
@@ -29,12 +30,16 @@ export default class Game extends Phaser.Scene {
     this.add.existing(this.rack);
     this.columns = [];
     for (let i = 0; i < 6; i++) {
-      const column = new Column(this, i, ["A", "B", "C"], word_dict, () => {});
+      const column = new Column(this, i, ["A", "B", "C"], word_dict, () =>
+        this.addRackTile(i)
+      );
       this.columns.push(column);
       this.add.existing(column);
+      column.addNewButton();
+      if (i == 0) {
+        column.removeButton();
+      }
     }
-    this.columns[0].isCorrectWord();
-    this.columns[0].addNewButton();
     this.clockTime = C.TIME_PER_LEVEL;
     this.clock = this.add.text(700, 32, this.clockTime.toString());
     const timedEvent = this.time.addEvent({
@@ -64,24 +69,25 @@ export default class Game extends Phaser.Scene {
     this.clockTime -= 1; // One second
     if (this.clockTime <= 0) {
       for (let column of this.columns) {
-        // handle earthquakes
-        // column.earthquake();
+        column.onEarthquake();
       }
       this.clockTime = C.TIME_PER_LEVEL;
     }
+
     this.clock.setText(this.clockTime.toString());
   }
 
-  addRackTile(i: number): string {
-    return "X";
+  addRackTile(i: number) {
+    let tile = new Tile(this, "X", i * 70, 5 * 40);
+    this.columns[i].addTile(tile);
   }
 }
 
 const config = {
   type: Phaser.AUTO,
   backgroundColor: "#125555",
-  width: 800,
-  height: 600,
+  width: C.SCREEN_WIDTH,
+  height: C.SCREEN_HEIGHT,
   scene: Game,
 };
 

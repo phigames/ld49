@@ -3,6 +3,7 @@ import Tile from "./tile";
 export default class Rack extends Phaser.GameObjects.Container {
   tiles: Tile[];
   letters: string[];
+  activeLetter: number;
 
   constructor(scene: Phaser.Scene) {
     super(scene, 400, 500);
@@ -31,6 +32,16 @@ export default class Rack extends Phaser.GameObjects.Container {
       const newTile = new Tile(this.scene, letter, newTileX, 0);
       this.tiles.push(newTile);
       this.add(newTile);
+
+      // Add event listener
+      newTile.on(
+        "pointerup",
+        () => {
+          this.activeLetter = this.tiles.length - 1;
+          console.log(letter + " added");
+        },
+        this
+      );
       this.updateTileCoords();
       return true;
     }
