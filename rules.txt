@@ -1,0 +1,21 @@
+Rack
+ - Wird aufgefüllt, sobald ein Wort bestätigt wird
+ - Auffüllung nach Scrabble-Frequenzen
+ - Es soll immer mindestens 1 Vokal im Rack sein
+
+Säulen
+ - Säulenumrisse sind immer alle da
+ - Sobald ein Buchstabe in einen Umriss gedropped wird, erscheint die ganze Säule
+ - Buchstaben kann man innerhalb von Säulen frei kombinieren
+ - Man muss neue Wörter bestätigen (System check Gültigkeit)
+ - Nach einer Bestätigung werden alle momentanen Buchstaben in einer Säule "unrackable"
+ - Unrackable Buchstaben bleiben für immer unrackable
+
+Erdbeben
+ - Aus jeder Säule fällt ein zufälliger Buchstabe
+ - Alle stabilen Säulen werden instabil
+ - Instabile Säulen kollabieren
+
+Level
+ - Aufgabe: mindestens eine stabile Säule bauen (sonst game over)
+ - Buchstaben via drag & drop in Säulen einfüllen
