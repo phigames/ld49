@@ -30,19 +30,17 @@ export default class Column extends Phaser.GameObjects.Container {
     );
   }
 
+  removeButton() {}
+
   getWordString() {
     let word = "";
     for (const tile of this.tiles) {
       word += tile.letter;
     }
-    console.log(word);
     return word;
   }
 
   isCorrectWord() {
-    console.log(this.dictionary.wordInDict(this.getWordString()));
     return this.dictionary.wordInDict(this.getWordString());
   }
-
-  removeButton() {}
 }
