@@ -133,7 +133,7 @@ export default class Game extends Phaser.Scene {
       message = message + elem;
     }
 
-    this.tutorial = new TextBox(this, message, 35, 20, 370, 345);
+    this.tutorial = new TextBox(this, message, 35, 20, 370, 344);
     this.add.existing(this.tutorial);
 
     // Test functions for removing/adding rack tiles (hehe)
