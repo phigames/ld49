@@ -10,8 +10,8 @@ export default class Rack extends Phaser.GameObjects.Container {
     super(scene, 320, 400);
 
     this.tiles = [];
+    this.activeTileIndex = null;
     this.updateColumnButtons = updateColumnButtons;
-    this.fill();
   }
 
   updateTileCoords() {
@@ -47,8 +47,9 @@ export default class Rack extends Phaser.GameObjects.Container {
 
   removeTile(i: integer) {
     // Remove one element at index
-    this.remove(this.tiles[i]);
+    // this.remove(this.tiles[i]);
     this.tiles[i].destroy();
+    console.log("tile destroyed.");
     this.tiles.splice(i, 1);
     this.updateTileCoords();
     this.resetActiveTile();
@@ -71,9 +72,9 @@ export default class Rack extends Phaser.GameObjects.Container {
     }
   }
 
-  fill() {
+  fill(tilesToFill: integer) {
     // Fill rack with random letter tiles, ensuring at least one vowel
-    const nOfTiles = 8 - this.tiles.length;
+    const nOfTiles = Math.min(8 - this.tiles.length, tilesToFill);
 
     for (let i = 0; i < nOfTiles; i++) {
       const randomIndex = Math.floor(Math.random() * C.LETTERS.length);
@@ -83,11 +84,11 @@ export default class Rack extends Phaser.GameObjects.Container {
 
     while (!this.vowelInTiles()) {
       // Remove the elements we just added
-      for (let i = 7; i > nOfTiles - 1; i--) {
-        this.removeTile(i);
+      for (let i = this.tiles.length - nOfTiles; i < 8; i++) {
+        this.removeTile(this.tiles.length - 1);
       }
       // Call fill again
-      this.fill();
+      this.fill(nOfTiles);
     }
   }
 
