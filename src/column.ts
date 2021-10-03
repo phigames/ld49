@@ -2,6 +2,7 @@ import { Dictionary } from "./dictionary";
 import Tile from "./tile";
 
 export default class Column extends Phaser.GameObjects.Container {
+  background: Phaser.GameObjects.Image;
   tiles: Tile[];
   draggingTile: Tile | null;
   dictionary: Dictionary;
@@ -22,7 +23,13 @@ export default class Column extends Phaser.GameObjects.Container {
     this.isWord = false;
     this.dictionary = dictionary;
 
-    this.add(new Phaser.GameObjects.Image(this.scene, 0, -65, "column"));
+    this.background = new Phaser.GameObjects.Image(
+      this.scene,
+      0,
+      -65,
+      "column-crumbly"
+    );
+    this.add(this.background);
 
     letters.forEach((l, i) => {
       let tile = new Tile(scene, l, 0, 0);
@@ -57,6 +64,7 @@ export default class Column extends Phaser.GameObjects.Container {
           this.tiles.splice(index, 1);
           this.tiles.splice(i, 0, tile);
           this.updateTileCoords(true, tile);
+          this.checkCorrectWord();
           break;
         }
         if (i > index && tile.y > this.tiles[i].y - 16) {
@@ -64,6 +72,7 @@ export default class Column extends Phaser.GameObjects.Container {
           this.tiles.splice(index, 1);
           this.tiles.splice(i, 0, tile);
           this.updateTileCoords(true, tile);
+          this.checkCorrectWord();
           break;
         }
       }
@@ -127,5 +136,10 @@ export default class Column extends Phaser.GameObjects.Container {
 
   checkCorrectWord() {
     this.isWord = this.dictionary.wordInDict(this.getWordString());
+    if (this.isWord) {
+      this.background.setTexture("column");
+    } else {
+      this.background.setTexture("column-crumbly");
+    }
   }
 }

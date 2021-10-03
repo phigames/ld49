@@ -7,10 +7,6 @@ export class Dictionary {
     this.wordList = new Set(wordList);
   }
 
-  print_words() {
-    console.log(this.wordList);
-  }
-
   wordInDict(word) {
     return this.wordList.has(word);
   }
