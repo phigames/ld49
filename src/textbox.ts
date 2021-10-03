@@ -15,6 +15,7 @@ export default class TextBox extends Phaser.GameObjects.Container {
         color: "black",
         fontStyle: "bold",
         backgroundColor: "white",
+        padding: { x: 20, y: 20 },
       })
     );
   }

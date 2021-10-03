@@ -129,6 +129,9 @@ export default class Column extends Phaser.GameObjects.Container {
     }
     this.updateTileCoords();
     this.checkCorrectWord();
+    if (this.tiles.length === 0) {
+      this.makeColShadowy();
+    }
   }
 
   updateTileCoords(animate: boolean = false, excludeTile?: Tile) {
@@ -156,6 +159,9 @@ export default class Column extends Phaser.GameObjects.Container {
         }
       }
       nextTileY += distance;
+    }
+    if (this.tiles.length === 0) {
+      this.makeColShadowy();
     }
   }
 
@@ -253,6 +259,7 @@ export default class Column extends Phaser.GameObjects.Container {
   }
 
   makeColShadowy() {
+    this.background.setTexture("column");
     this.background.setTint(0xa9a9a9);
     this.background.setAlpha(0.7);
   }
