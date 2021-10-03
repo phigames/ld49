@@ -136,44 +136,44 @@ export default class Game extends Phaser.Scene {
     this.tutorial = new TextBox(this, message, 35, 20, 370, 344);
     this.add.existing(this.tutorial);
 
-    // Test functions for removing/adding rack tiles (hehe)
-    this.input.keyboard.on(
-      "keydown-R",
-      function () {
-        this.rack.removeTile(0);
-      },
-      this
-    );
-    this.input.keyboard.on(
-      "keydown-F",
-      function () {
-        console.log(this.rack.addTile("F"));
-      },
-      this
-    );
-    this.input.keyboard.on(
-      "keydown-A",
-      function () {
-        this.rack.fill(8);
-      },
-      this
-    );
-    this.input.keyboard.on(
-      "keydown-C",
-      function () {
-        this.moveTileToRack(this.columns[0], 0);
-      },
-      this
-    );
+    // // Test functions for removing/adding rack tiles (hehe)
+    // this.input.keyboard.on(
+    //   "keydown-R",
+    //   function () {
+    //     this.rack.removeTile(0);
+    //   },
+    //   this
+    // );
+    // this.input.keyboard.on(
+    //   "keydown-F",
+    //   function () {
+    //     console.log(this.rack.addTile("F"));
+    //   },
+    //   this
+    // );
+    // this.input.keyboard.on(
+    //   "keydown-A",
+    //   function () {
+    //     this.rack.fill(8);
+    //   },
+    //   this
+    // );
+    // this.input.keyboard.on(
+    //   "keydown-C",
+    //   function () {
+    //     this.moveTileToRack(this.columns[0], 0);
+    //   },
+    //   this
+    // );
 
-    this.input.keyboard.on(
-      "keydown-X",
-      function () {
-        console.log("gameover started");
-        this.scene.start("gameover");
-      },
-      this
-    );
+    // this.input.keyboard.on(
+    //   "keydown-X",
+    //   function () {
+    //     console.log("gameover started");
+    //     this.scene.start("gameover");
+    //   },
+    //   this
+    // );
   }
 
   update() {
@@ -271,6 +271,25 @@ export default class Game extends Phaser.Scene {
       (score) => {
         this.score += score;
         this.updateScoreText();
+        const scoreAnimation = this.add.text(
+          column.x,
+          column.y + column.tiles[0].y - 20,
+          `+${score}`,
+          {
+            fontFamily: C.FONT_FAMILY,
+            fontSize: "20px",
+            fontStyle: "bold",
+            color: "#d29465",
+          }
+        );
+        this.tweens.add({
+          targets: scoreAnimation,
+          props: { y: scoreAnimation.y - 50, opacity: 0 },
+          duration: 700,
+          onComplete: () => {
+            scoreAnimation.destroy();
+          },
+        });
       }
     );
     this.columns.splice(i, 0, column);
