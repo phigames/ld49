@@ -156,6 +156,9 @@ export default class Column extends Phaser.GameObjects.Container {
   unlock() {
     this.isLocked = false;
     this.updateLockButton();
+    for (const tile of this.tiles) {
+      tile.unlock();
+    }
   }
 
   updateLockButton() {
@@ -164,9 +167,15 @@ export default class Column extends Phaser.GameObjects.Container {
       if (this.isLocked) {
         this.lockButton.setTexture("letter-O");
         this.scene.input.disable(this.lockButton);
+        for (const tile of this.tiles) {
+          tile.lock();
+        }
       } else {
         this.lockButton.setTexture("letter-C");
         this.lockButton.setInteractive({ cursor: "pointer" });
+        for (const tile of this.tiles) {
+          tile.unlock();
+        }
       }
     } else {
       this.lockButton.setVisible(false);
