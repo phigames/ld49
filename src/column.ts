@@ -256,8 +256,8 @@ export default class Column extends Phaser.GameObjects.Container {
   }
 
   makeColShadowy() {
-    this.background.setTint(0x696969);
-    this.background.setAlpha(0.5);
+    this.background.setTint(0xa9a9a9);
+    this.background.setAlpha(0.7);
   }
 
   makeColStable() {
