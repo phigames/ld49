@@ -129,12 +129,22 @@ export default class Game extends Phaser.Scene {
   }
 }
 
-const config = {
+const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   backgroundColor: "#125555",
   width: C.SCREEN_WIDTH,
   height: C.SCREEN_HEIGHT,
   scene: Game,
+  scale: {
+    zoom:
+      window.innerHeight >= C.SCREEN_HEIGHT * 2 &&
+      window.innerWidth >= C.SCREEN_WIDTH * 2
+        ? 2
+        : window.innerHeight >= C.SCREEN_HEIGHT * 1.5 &&
+          window.innerWidth >= C.SCREEN_WIDTH * 1.5
+        ? 1.5
+        : 1,
+  },
 };
 
 const game = new Phaser.Game(config);

@@ -82,11 +82,11 @@ export default class Column extends Phaser.GameObjects.Container {
   }
 
   updateTileCoords(animate: boolean = false, excludeTile?: Tile) {
-    const distance = 38;
-    let nextTileY = 87 - distance * this.tiles.length;
+    const distance = 35;
+    let nextTileY = 86 - distance * this.tiles.length;
     for (const tile of this.tiles) {
       if (tile !== excludeTile) {
-        tile.x = -1;
+        tile.x = 0;
         if (tile.y !== nextTileY) {
           if (animate) {
             if (!this.scene.tweens.isTweening(tile)) {
