@@ -42,7 +42,8 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    getLeaderboard().then((data) => console.log(data));
+    this.sound.pauseOnBlur = false;
+
     this.add.image(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2, "background");
     const data = this.cache.json.get("wordList");
     this.dictionary = new Dictionary(data);
@@ -207,7 +208,7 @@ export default class Game extends Phaser.Scene {
     this.clockTime -= 1; // One second
     if (this.clockTime == 0) {
       this.cameras.main.shake(
-        C.EARTHQUAKE_DURATION * 1000,
+        C.EARTHQUAKE_DURATION * 1500,
         C.EARTHQUAKE_INTENSITY
       );
       for (let i = 0; i < this.columns.length; i++) {
@@ -287,7 +288,7 @@ export default class Game extends Phaser.Scene {
         );
         this.tweens.add({
           targets: scoreAnimation,
-          props: { y: scoreAnimation.y - 50, opacity: 0 },
+          props: { y: scoreAnimation.y - 50, alpha: 0 },
           duration: 700,
           onComplete: () => {
             scoreAnimation.destroy();
@@ -338,9 +339,20 @@ export default class Game extends Phaser.Scene {
       },
     });
 
+    const winText = this.add
+      .text(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2, "YOU DID IT!", {
+        fontFamily: C.FONT_FAMILY,
+        fontSize: "70px",
+        fontStyle: "bold",
+        color: "#d29465",
+      })
+      .setOrigin(0.5);
+    winText.setAlpha(0);
+
     const nameform = this.add
       .dom(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2)
       .createFromCache("nameform");
+    nameform.setAlpha(0);
     const usernameField = nameform.getChildByName("username");
     const form = nameform.getChildByID("nameform");
     form.addEventListener("submit", (event) => {
@@ -395,7 +407,13 @@ export default class Game extends Phaser.Scene {
 
     this.tweens.add({
       targets: nameform,
-      y: 300,
+      props: { y: 300, alpha: 1 },
+      duration: 3000,
+      ease: "Power3",
+    });
+    this.tweens.add({
+      targets: winText,
+      props: { y: 200, alpha: 1 },
       duration: 3000,
       ease: "Power3",
     });
