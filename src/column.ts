@@ -124,12 +124,8 @@ export default class Column extends Phaser.GameObjects.Container {
     });
   }
 
-  removeTile(index: number, destroy: boolean = false) {
-    if (destroy) {
-      this.tiles[index].destroy();
-    } else {
-      this.remove(this.tiles[index]);
-    }
+  removeTile(index: number) {
+    this.tiles[index].destroy();
     this.tiles.splice(index, 1);
     this.updateTileCoords();
     this.checkCorrectWord();
