@@ -26,7 +26,7 @@ export default class Column extends Phaser.GameObjects.Container {
     onTileClick,
     onCountScore
   ) {
-    super(scene, 70 + index * 100, 239);
+    super(scene, 70 + index * 100, 238);
     this.tiles = [];
     this.dragging = false;
     this.isWord = false;
@@ -34,8 +34,8 @@ export default class Column extends Phaser.GameObjects.Container {
 
     this.background = new Phaser.GameObjects.Image(
       this.scene,
-      0,
-      -65,
+      1,
+      -64,
       "column-crumbly"
     );
     this.add(this.background);
@@ -137,7 +137,7 @@ export default class Column extends Phaser.GameObjects.Container {
   }
 
   updateTileCoords(animate: boolean = false, excludeTile?: Tile) {
-    const distance = 35;
+    const distance = 34;
     let nextTileY = 86 - distance * this.tiles.length;
     for (const tile of this.tiles) {
       if (tile !== excludeTile) {
