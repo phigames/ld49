@@ -11,6 +11,7 @@ export default class Game extends Phaser.Scene {
   clock: Phaser.GameObjects.Text;
   clockTime: number;
   dictionary: Dictionary;
+  level: number;
 
   constructor() {
     super("game");
@@ -25,6 +26,7 @@ export default class Game extends Phaser.Scene {
     this.load.image("column-crumbly", "assets/column-crumbly.png");
 
     this.load.json("wordList", "assets/words.json");
+    this.level = 0;
   }
 
   create() {
@@ -53,15 +55,6 @@ export default class Game extends Phaser.Scene {
     });
     this.rack.fill(8);
     this.add.existing(this.rack);
-
-    this.clockTime = C.TIME_PER_LEVEL;
-    this.clock = this.add.text(600, 32, this.clockTime.toString());
-    const timedEvent = this.time.addEvent({
-      delay: 1000,
-      callback: this.onClockTick,
-      callbackScope: this,
-      loop: true,
-    });
 
     // Test functions for removing/adding rack tiles (hehe)
     this.input.keyboard.on(
@@ -92,6 +85,28 @@ export default class Game extends Phaser.Scene {
       },
       this
     );
+  }
+
+  update() {
+    if (this.level == 0) {
+      if (this.columns.some((column) => column.isLocked === true)) {
+        this.level = 1;
+      }
+    }
+
+    // clock
+    if (this.level == 1) {
+      console.log("clock should stark");
+      this.clockTime = C.TIME_PER_LEVEL;
+      this.clock = this.add.text(600, 32, this.clockTime.toString());
+      const timedEvent = this.time.addEvent({
+        delay: 1000,
+        callback: this.onClockTick,
+        callbackScope: this,
+        loop: true,
+      });
+      this.level += 1;
+    }
   }
 
   onClockTick() {
