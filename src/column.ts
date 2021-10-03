@@ -9,6 +9,7 @@ export default class Column extends Phaser.GameObjects.Container {
   addButton: Phaser.GameObjects.Image;
   lockButton: Phaser.GameObjects.Image;
   onAddButtonClick: Function;
+  onTileClick: Function;
   isWord: boolean;
   isLocked: boolean;
 
@@ -17,7 +18,8 @@ export default class Column extends Phaser.GameObjects.Container {
     index: number,
     letters: string[],
     dictionary: Dictionary,
-    onAddButtonClick
+    onAddButtonClick,
+    onTileClick
   ) {
     super(scene, 70 + index * 100, 239);
     this.tiles = [];
@@ -61,6 +63,7 @@ export default class Column extends Phaser.GameObjects.Container {
     this.addButton.setInteractive({ useHandCursor: true });
     this.hideAddButton();
     this.onAddButtonClick = onAddButtonClick;
+    this.onTileClick = onTileClick;
     this.addButton.on("pointerup", this.onAddButtonClick);
   }
 
@@ -70,7 +73,13 @@ export default class Column extends Phaser.GameObjects.Container {
     this.add(tile);
     this.updateTileCoords();
     this.checkCorrectWord();
-
+    tile.on(
+      "pointerup",
+      () => {
+        this.onTileClick(tile);
+      },
+      this
+    );
     this.scene.input.setDraggable(tile);
     tile.on("dragstart", () => {
       if (!this.isLocked) {
