@@ -42,7 +42,7 @@ export default class Column extends Phaser.GameObjects.Container {
       "letter-C"
     );
     this.add(this.lockButton);
-    this.lockButton.on("pointerup", () => {
+    this.lockButton.on("pointerdown", () => {
       this.isLocked = true;
       this.updateLockButton();
     });
@@ -64,7 +64,7 @@ export default class Column extends Phaser.GameObjects.Container {
     this.hideAddButton();
     this.onAddButtonClick = onAddButtonClick;
     this.onTileClick = onTileClick;
-    this.addButton.on("pointerup", this.onAddButtonClick);
+    this.addButton.on("pointerdown", this.onAddButtonClick);
   }
 
   addTile(tile: Tile) {
@@ -74,9 +74,11 @@ export default class Column extends Phaser.GameObjects.Container {
     this.updateTileCoords();
     this.checkCorrectWord();
     tile.on(
-      "pointerup",
+      "pointerdown",
       () => {
-        this.onTileClick(tile);
+        if (this.draggingTile === null) {
+          this.onTileClick(tile);
+        }
       },
       this
     );
