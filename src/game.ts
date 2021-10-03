@@ -36,20 +36,24 @@ export default class Game extends Phaser.Scene {
     const data = this.cache.json.get("wordList");
     this.dictionary = new Dictionary(data);
 
+    this.columns = [];
+    for (let i = 0; i < 6; i++) {
+      this.addColumn(i);
+    }
+
     this.rack = new Rack(this, () => {
+      console.log(this.columns);
       for (const column of this.columns) {
-        if (this.rack.activeTileIndex !== null) {
+        if (this.rack !== undefined && this.rack.activeTileIndex !== null) {
           column.showAddButton();
         } else {
           column.hideAddButton();
         }
       }
     });
+    this.rack.fill(8);
     this.add.existing(this.rack);
-    this.columns = [];
-    for (let i = 0; i < 6; i++) {
-      this.addColumn(i);
-    }
+
     this.clockTime = C.TIME_PER_LEVEL;
     this.clock = this.add.text(600, 32, this.clockTime.toString());
     const timedEvent = this.time.addEvent({
