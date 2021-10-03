@@ -97,7 +97,10 @@ export default class Game extends Phaser.Scene {
   onClockTick() {
     this.clockTime -= 1; // One second
     if (this.clockTime <= 0) {
-      this.cameras.main.shake(C.EARTHQUAKE_DURATION * 1000);
+      this.cameras.main.shake(
+        C.EARTHQUAKE_DURATION * 1000,
+        C.EARTHQUAKE_INTENSITY
+      );
       for (let i = 0; i < this.columns.length; i++) {
         const column = this.columns[i];
         column.hideAddButton();
@@ -116,6 +119,7 @@ export default class Game extends Phaser.Scene {
           column.destroy(true);
         }
       }
+      this.rack.fill(8);
       this.clockTime = C.TIME_PER_LEVEL + C.EARTHQUAKE_DURATION;
     }
     this.clock.setText(this.clockTime.toString());
