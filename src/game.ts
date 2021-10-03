@@ -56,7 +56,15 @@ export default class Game extends Phaser.Scene {
     this.rack.fill(8);
     this.add.existing(this.rack);
     this.score = 0;
-    this.scoreText = this.add.text(530, 400, this.score.toString());
+    this.scoreText = this.add
+      .text(C.SCREEN_WIDTH / 2 + 18, C.SCREEN_HEIGHT - 33, "", {
+        fontFamily: C.FONT_FAMILY,
+        fontSize: "25px",
+        align: "center",
+        color: "black",
+      })
+      .setOrigin(0.5);
+    this.updateScoreText();
 
     this.clockTime = C.TIME_PER_LEVEL;
     this.clock = this.add
@@ -202,6 +210,10 @@ export default class Game extends Phaser.Scene {
     this.levelDisplay.setText(`${this.level} / ${C.NUMBER_OF_LEVELS}`);
   }
 
+  updateScoreText() {
+    this.scoreText.setText(`Score: ${this.score}`);
+  }
+
   addColumn(i: number) {
     const column = new Column(
       this,
@@ -212,7 +224,10 @@ export default class Game extends Phaser.Scene {
       //TODO provide fill function
       (numRackableTiles) => this.rack.fill(numRackableTiles),
       (tile) => this.moveTileToRack(column, tile),
-      (score) => this.updateScore(score)
+      (score) => {
+        this.score += score;
+        this.updateScoreText();
+      }
     );
     this.columns.splice(i, 0, column);
     this.add.existing(column);
@@ -240,11 +255,6 @@ export default class Game extends Phaser.Scene {
       column.removeTile(tileIndex);
       this.rack.addTile(tile.letter);
     }
-  }
-
-  updateScore(score: number) {
-    this.score = this.score + score;
-    this.scoreText = this.scoreText.setText(this.score.toString());
   }
 }
 
