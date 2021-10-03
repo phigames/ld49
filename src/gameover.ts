@@ -51,7 +51,7 @@ export default class Gameover extends Phaser.Scene {
     });
 
     this.add
-      .text(320, 300, "Click spacebar to try again", {
+      .text(320, 300, "Press spacebar to try again", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "25px",
         align: "center",
