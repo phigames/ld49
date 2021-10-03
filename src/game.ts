@@ -81,6 +81,13 @@ export default class Game extends Phaser.Scene {
       },
       this
     );
+    this.input.keyboard.on(
+      "keydown-C",
+      function () {
+        this.moveTileToRack(this.columns[0], 0);
+      },
+      this
+    );
   }
 
   onEvent() {
@@ -130,13 +137,13 @@ export default class Game extends Phaser.Scene {
     }
   }
 
-  // moveTileToRack(column: Column, index: number) {
-  //   const tile = column.tiles[index];
-  //   if (tile.rackable) {
-  //     column.removeTile(index);
-  //     this.rack.addTile(tile.letter);
-  //   }
-  // }
+  moveTileToRack(column: Column, index: number) {
+    const tile = column.tiles[index];
+    if (tile.rackable) {
+      column.removeTile(index);
+      this.rack.addTile(tile.letter);
+    }
+  }
 }
 
 const config: Phaser.Types.Core.GameConfig = {
