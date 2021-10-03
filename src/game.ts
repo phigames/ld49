@@ -125,7 +125,7 @@ export default class Game extends Phaser.Scene {
       "collapsing!\n",
       "\n",
       "Earthquakes will delete letters\n",
-      "and make pillar unstable! Fix\n",
+      "and make pillars unstable! Fix\n",
       "them fast before they collapse\n",
       "in the next quake.",
     ];
