@@ -5,6 +5,7 @@ export default class Rack extends Phaser.GameObjects.Container {
   tiles: Tile[];
   activeTileIndex: number | null;
   updateColumnButtons: Function;
+  highlightRect2: Phaser.GameObjects.Graphics;
 
   constructor(scene: Phaser.Scene, updateColumnButtons: Function) {
     super(scene, 321, 397);
@@ -36,8 +37,24 @@ export default class Rack extends Phaser.GameObjects.Container {
         "pointerup",
         () => {
           this.activeTileIndex = this.tiles.indexOf(newTile);
-          this.tintActiveTile();
+          // this.tintActiveTile();
           this.updateColumnButtons();
+
+          // If highlight, remove it
+          if (this.highlightRect2) {
+            this.highlightRect2.destroy();
+          }
+          // Add highlight when clicked
+          this.highlightRect2 = new Phaser.GameObjects.Graphics(this.scene);
+          this.highlightRect2.fillStyle(0xffffff, 0.3);
+          this.highlightRect2.fillRoundedRect(
+            newTile.x - 16,
+            newTile.y - 16,
+            32,
+            32,
+            3
+          );
+          this.add(this.highlightRect2);
         },
         this
       );
@@ -52,22 +69,14 @@ export default class Rack extends Phaser.GameObjects.Container {
     this.updateTileCoords();
     this.resetActiveTile();
     this.updateColumnButtons();
+    // Remove highlight
+    if (this.highlightRect2) {
+      this.highlightRect2.destroy();
+    }
   }
 
   resetActiveTile() {
     this.activeTileIndex = null;
-    this.tintActiveTile();
-  }
-
-  tintActiveTile() {
-    for (let i = 0; i < this.tiles.length; i++) {
-      const tile = this.tiles[i];
-      if (i === this.activeTileIndex) {
-        tile.setTint(0x888888);
-      } else {
-        tile.setTint(0xffffff);
-      }
-    }
   }
 
   fill(tilesToFill: integer) {
@@ -100,7 +109,6 @@ export default class Rack extends Phaser.GameObjects.Container {
         vowelInTiles = true;
       }
     }
-    console.log("Vowel in tiles: " + vowelInTiles);
     return vowelInTiles;
   }
 }

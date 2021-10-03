@@ -82,7 +82,6 @@ export default class Column extends Phaser.GameObjects.Container {
     this.onLockButtonClick = onLockButtonClick;
     this.onCountScore = onCountScore;
     this.lockButton.on("pointerup", () => {
-      console.log("pointer_up event registered!");
       this.onLockButtonClick(this.countNewTiles());
       this.lock();
       this.onCountScore(this.score());
@@ -282,7 +281,7 @@ export default class Column extends Phaser.GameObjects.Container {
     for (let i = 0; i < this.tiles.length; i++) {
       const tile = this.tiles[i];
       if (!tile.rackable) {
-        tile.setTint(0xe0e0e0);
+        tile.setTint(0xc4c4c4);
       } else {
         tile.clearTint();
       }
