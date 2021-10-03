@@ -7,6 +7,7 @@ export default class Column extends Phaser.GameObjects.Container {
   draggingTile: Tile | null;
   dictionary: Dictionary;
   button: Phaser.GameObjects.Image;
+  lockButton: Phaser.GameObjects.Image;
   buttonAddsTile: Function;
   isWord: boolean;
 
@@ -31,6 +32,16 @@ export default class Column extends Phaser.GameObjects.Container {
     );
     this.add(this.background);
 
+    this.lockButton = new Phaser.GameObjects.Image(
+      this.scene,
+      30,
+      70,
+      "letter-C"
+    );
+    this.add(this.lockButton);
+    this.lockButton.setInteractive({ useHandCursor: true });
+    this.lockButton.on("pointerup", () => {});
+
     letters.forEach((l, i) => {
       let tile = new Tile(scene, l, 0, 0);
       this.addTile(tile);
@@ -38,7 +49,7 @@ export default class Column extends Phaser.GameObjects.Container {
 
     this.button = new Phaser.GameObjects.Image(this.scene, 0, 100, "letter-X");
     this.add(this.button);
-    this.button.setInteractive();
+    this.button.setInteractive({ useHandCursor: true });
     this.hideButton();
     this.buttonAddsTile = buttonAddsTile;
     this.button.on("pointerup", this.buttonAddsTile);
@@ -126,6 +137,14 @@ export default class Column extends Phaser.GameObjects.Container {
     this.button.setVisible(false);
   }
 
+  updateLockButton() {
+    if (this.isWord) {
+      this.lockButton.setVisible(true);
+    } else {
+      this.lockButton.setVisible(false);
+    }
+  }
+
   getWordString() {
     let word = "";
     for (const tile of this.tiles) {
@@ -141,5 +160,6 @@ export default class Column extends Phaser.GameObjects.Container {
     } else {
       this.background.setTexture("column-crumbly");
     }
+    this.updateLockButton();
   }
 }
