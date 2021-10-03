@@ -127,6 +127,14 @@ export default class Game extends Phaser.Scene {
       this.rack.removeTile(index);
     }
   }
+
+  // moveTileToRack(column: Column, index: number) {
+  //   const tile = column.tiles[index];
+  //   if (tile.rackable) {
+  //     column.removeTile(index);
+  //     this.rack.addTile(tile.letter);
+  //   }
+  // }
 }
 
 const config: Phaser.Types.Core.GameConfig = {
