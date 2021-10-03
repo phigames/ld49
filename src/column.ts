@@ -69,6 +69,7 @@ export default class Column extends Phaser.GameObjects.Container {
 
   addTile(tile: Tile) {
     tile.removeAllListeners();
+    this.unlock();
     this.tiles.push(tile);
     this.add(tile);
     this.updateTileCoords();
