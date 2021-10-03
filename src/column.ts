@@ -132,7 +132,7 @@ export default class Column extends Phaser.GameObjects.Container {
   }
 
   updateTileCoords(animate: boolean = false, excludeTile?: Tile) {
-    const distance = 35;
+    const distance = 34;
     let nextTileY = 86 - distance * this.tiles.length;
     for (const tile of this.tiles) {
       if (tile !== excludeTile) {
