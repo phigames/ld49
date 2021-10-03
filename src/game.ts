@@ -124,21 +124,16 @@ export default class Game extends Phaser.Scene {
     this.clockState = "none";
 
     const messages = [
-      "Make words in the pillars to\n",
-      "to prevent the temple from\n",
-      "collapsing!\n",
-      "\n",
-      "Earthquakes will delete letters\n",
-      "and make pillars unstable! Fix\n",
-      "them fast before they collapse\n",
-      "in the next quake.",
+      "Make words in the pillars to prevent the temple from collapsing!\n\n" +
+        "Earthquakes will delete letters and make pillars unstable! " +
+        "Fix them fast before they collapse in the next quake.",
     ];
     let message = "";
     for (const elem of messages) {
       message = message + elem;
     }
 
-    this.tutorial = new TextBox(this, message, 10, 10);
+    this.tutorial = new TextBox(this, message, 35, 20, 370, 345);
     this.add.existing(this.tutorial);
 
     // Test functions for removing/adding rack tiles (hehe)
@@ -318,7 +313,9 @@ export default class Game extends Phaser.Scene {
       },
     });
 
-    const nameform = this.add.dom(300, 300).createFromCache("nameform");
+    const nameform = this.add
+      .dom(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2)
+      .createFromCache("nameform");
     const usernameField = nameform.getChildByName("username");
     const form = nameform.getChildByID("nameform");
     form.addEventListener("submit", (event) => {
