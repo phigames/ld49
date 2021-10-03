@@ -244,7 +244,7 @@ export default class Column extends Phaser.GameObjects.Container {
     for (let i = 0; i < this.tiles.length; i++) {
       const tile = this.tiles[i];
       if (!tile.rackable) {
-        tile.setTint(0x888888);
+        tile.setTint(0xe0e0e0);
       } else {
         tile.setTint(0xffffff);
       }
