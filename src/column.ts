@@ -1,5 +1,6 @@
 import { Dictionary } from "./dictionary";
 import Tile from "./tile";
+import * as C from "./constants";
 
 export default class Column extends Phaser.GameObjects.Container {
   background: Phaser.GameObjects.Image;
@@ -10,6 +11,7 @@ export default class Column extends Phaser.GameObjects.Container {
   lockButton: Phaser.GameObjects.Image;
   onAddButtonClick: Function;
   onLockButtonClick: Function;
+  onCountScore: Function;
   onTileClick: Function;
   isWord: boolean;
   isLocked: boolean;
@@ -21,7 +23,8 @@ export default class Column extends Phaser.GameObjects.Container {
     dictionary: Dictionary,
     onAddButtonClick,
     onLockButtonClick,
-    onTileClick
+    onTileClick,
+    onCountScore
   ) {
     super(scene, 70 + index * 100, 239);
     this.tiles = [];
@@ -70,9 +73,11 @@ export default class Column extends Phaser.GameObjects.Container {
 
     this.add(this.lockButton);
     this.onLockButtonClick = onLockButtonClick;
+    this.onCountScore = onCountScore;
     this.lockButton.on("pointerup", () => {
       this.onLockButtonClick(this.countNewTiles());
       this.lock();
+      this.onCountScore(this.score());
     });
   }
 
@@ -247,5 +252,13 @@ export default class Column extends Phaser.GameObjects.Container {
         tile.setTint(0xffffff);
       }
     }
+  }
+
+  score(): number {
+    let score = 0;
+    for (let tile of this.tiles) {
+      score = score + C.LETTER_SCORES[tile.letter];
+    }
+    return score;
   }
 }
