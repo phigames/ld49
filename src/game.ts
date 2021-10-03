@@ -75,7 +75,7 @@ export default class Game extends Phaser.Scene {
 
     this.clockTime = C.TIME_PER_LEVEL;
     this.clock = this.add
-      .text(50, 380, "", {
+      .text(55, 380, "", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "30px",
         align: "center",
@@ -83,7 +83,7 @@ export default class Game extends Phaser.Scene {
       })
       .setOrigin(0.5);
     this.add
-      .text(50, 404, "sec until", {
+      .text(60, 404, "sec until", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "16px",
         align: "center",
@@ -92,7 +92,7 @@ export default class Game extends Phaser.Scene {
       })
       .setOrigin(0.5);
     this.add
-      .text(50, 420, "earthquake", {
+      .text(60, 420, "earthquake", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "16px",
         align: "center",
@@ -111,7 +111,7 @@ export default class Game extends Phaser.Scene {
       })
       .setOrigin(0.5);
     this.add
-      .text(590, 410, "earthquakes", {
+      .text(594, 410, "earthquakes", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "16px",
         align: "center",
@@ -328,7 +328,6 @@ export default class Game extends Phaser.Scene {
       delay: 2000,
       loop: false,
       callback: () => {
-        alert("WIN");
         for (const column of this.columns) {
           column.lock();
         }
@@ -345,6 +344,7 @@ export default class Game extends Phaser.Scene {
       event.preventDefault();
       const username: string = usernameField["value"];
       if (username.trim() !== "") {
+        usernameField["disabled"] = true;
         postScore(username, this.score).then(() => {
           nameform.destroy();
           this.add
@@ -376,6 +376,9 @@ export default class Game extends Phaser.Scene {
             console.log(text);
             leaderboard.setText(text);
           });
+        }).catch(() => {
+          usernameField["disabled"] = false;
+          usernameField["value"] = "ERROR (please try again)";
         });
       }
     });
