@@ -124,66 +124,65 @@ export default class Game extends Phaser.Scene {
     this.clockState = "none";
 
     const messages = [
-      "Make words in the pillars to\n",
-      "to prevent the temple from\n",
-      "collapsing!\n",
-      "\n",
-      "Earthquakes will delete letters\n",
-      "and make pillars unstable! Fix\n",
-      "them fast before they collapse\n",
-      "in the next quake.",
+      "Make words in the pillars to prevent the temple from collapsing!\n\n" +
+        "Earthquakes will delete letters and make pillars unstable! " +
+        "Fix them fast before they collapse in the next quake.",
     ];
     let message = "";
     for (const elem of messages) {
       message = message + elem;
     }
 
-    this.tutorial = new TextBox(this, message, 10, 10);
+    this.tutorial = new TextBox(this, message, 35, 20, 370, 344);
     this.add.existing(this.tutorial);
 
-    // Test functions for removing/adding rack tiles (hehe)
-    this.input.keyboard.on(
-      "keydown-R",
-      function () {
-        this.rack.removeTile(0);
-      },
-      this
-    );
-    this.input.keyboard.on(
-      "keydown-F",
-      function () {
-        console.log(this.rack.addTile("F"));
-      },
-      this
-    );
-    this.input.keyboard.on(
-      "keydown-A",
-      function () {
-        this.rack.fill(8);
-      },
-      this
-    );
-    this.input.keyboard.on(
-      "keydown-C",
-      function () {
-        this.moveTileToRack(this.columns[0], 0);
-      },
-      this
-    );
+    // // Test functions for removing/adding rack tiles (hehe)
+    // this.input.keyboard.on(
+    //   "keydown-R",
+    //   function () {
+    //     this.rack.removeTile(0);
+    //   },
+    //   this
+    // );
+    // this.input.keyboard.on(
+    //   "keydown-F",
+    //   function () {
+    //     console.log(this.rack.addTile("F"));
+    //   },
+    //   this
+    // );
+    // this.input.keyboard.on(
+    //   "keydown-A",
+    //   function () {
+    //     this.rack.fill(8);
+    //   },
+    //   this
+    // );
+    // this.input.keyboard.on(
+    //   "keydown-C",
+    //   function () {
+    //     this.moveTileToRack(this.columns[0], 0);
+    //   },
+    //   this
+    // );
 
-    this.input.keyboard.on(
-      "keydown-X",
-      function () {
-        console.log("gameover started");
-        this.scene.start("gameover");
-      },
-      this
-    );
+    // this.input.keyboard.on(
+    //   "keydown-X",
+    //   function () {
+    //     console.log("gameover started");
+    //     this.scene.start("gameover");
+    //   },
+    //   this
+    // );
   }
 
   update() {
     if (this.clockState === "none") {
-      if (this.columns.some((column) => column.isLocked === true)) {
+      if (
+        this.columns.some(
+          (column) => column.isLocked === true && column.tiles.length > 0
+        )
+      ) {
         this.clockState = "running";
         this.tutorial.destroy();
       }
@@ -272,6 +271,25 @@ export default class Game extends Phaser.Scene {
       (score) => {
         this.score += score;
         this.updateScoreText();
+        const scoreAnimation = this.add.text(
+          column.x,
+          column.y + column.tiles[0].y - 20,
+          `+${score}`,
+          {
+            fontFamily: C.FONT_FAMILY,
+            fontSize: "20px",
+            fontStyle: "bold",
+            color: "#d29465",
+          }
+        );
+        this.tweens.add({
+          targets: scoreAnimation,
+          props: { y: scoreAnimation.y - 50, opacity: 0 },
+          duration: 700,
+          onComplete: () => {
+            scoreAnimation.destroy();
+          },
+        });
       }
     );
     this.columns.splice(i, 0, column);
@@ -318,7 +336,9 @@ export default class Game extends Phaser.Scene {
       },
     });
 
-    const nameform = this.add.dom(300, 300).createFromCache("nameform");
+    const nameform = this.add
+      .dom(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2)
+      .createFromCache("nameform");
     const usernameField = nameform.getChildByName("username");
     const form = nameform.getChildByID("nameform");
     form.addEventListener("submit", (event) => {
