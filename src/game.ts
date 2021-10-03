@@ -120,7 +120,7 @@ export default class Game extends Phaser.Scene {
     const column = new Column(
       this,
       i,
-      ["A", "B", "C"],
+      [],
       this.dictionary,
       () => this.addRackTileToColumn(i),
       //TODO provide fill function
@@ -140,6 +140,7 @@ export default class Game extends Phaser.Scene {
       let tile = new Tile(this, letter, 0, 0);
       this.columns[i].addTile(tile);
       this.rack.removeTile(index);
+      this.columns[i].unlock();
     }
   }
 

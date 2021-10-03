@@ -48,6 +48,7 @@ export default class Column extends Phaser.GameObjects.Container {
       let tile = new Tile(scene, l, 0, 0);
       this.addTile(tile);
     });
+    this.updateLockButton();
 
     this.addButton = new Phaser.GameObjects.Image(
       this.scene,
