@@ -41,12 +41,7 @@ export default class Column extends Phaser.GameObjects.Container {
     this.add(this.background);
     this.makeColShadowy();
 
-    this.lockButton = new Phaser.GameObjects.Image(
-      this.scene,
-      30,
-      70,
-      "letter-C"
-    );
+    this.lockButton = new Phaser.GameObjects.Image(this.scene, 30, 70, "ok2");
     this.add(this.lockButton);
     this.lockButton.on("pointerup", () => {
       this.isLocked = true;
@@ -59,12 +54,7 @@ export default class Column extends Phaser.GameObjects.Container {
     });
     this.updateLockButton();
 
-    this.addButton = new Phaser.GameObjects.Image(
-      this.scene,
-      0,
-      100,
-      "letter-X"
-    );
+    this.addButton = new Phaser.GameObjects.Image(this.scene, 0, 100, "arrow");
     this.add(this.addButton);
     this.addButton.setInteractive({ useHandCursor: true });
     this.hideAddButton();
@@ -198,7 +188,7 @@ export default class Column extends Phaser.GameObjects.Container {
           tile.lock();
         }
       } else {
-        this.lockButton.setTexture("letter-C");
+        this.lockButton.setTexture("ok2");
         this.lockButton.setInteractive({ cursor: "pointer" });
         for (const tile of this.tiles) {
           tile.unlock();
