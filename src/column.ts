@@ -15,6 +15,8 @@ export default class Column extends Phaser.GameObjects.Container {
   onTileClick: Function;
   isWord: boolean;
   isLocked: boolean;
+  highlight: Phaser.GameObjects.Rectangle;
+  highlightRect: Phaser.GameObjects.Graphics;
 
   constructor(
     scene: Phaser.Scene,
@@ -62,13 +64,42 @@ export default class Column extends Phaser.GameObjects.Container {
     this.onTileClick = onTileClick;
     this.addButton.on("pointerup", this.onAddButtonClick);
 
+    // Highlight on mouseover
+    this.addButton.on("pointerover", () => {
+      this.highlightRect = new Phaser.GameObjects.Graphics(this.scene);
+      this.highlightRect.fillStyle(0xffffff, 0.3);
+      this.highlightRect.fillRoundedRect(0 - 16, 100 - 24, 32, 48, 2);
+      this.add(this.highlightRect);
+    });
+    this.addButton.on("pointerout", () => {
+      this.highlightRect.destroy();
+    });
+    this.addButton.on("pointerup", () => {
+      this.highlightRect.destroy();
+    });
+
     this.add(this.lockButton);
     this.onLockButtonClick = onLockButtonClick;
     this.onCountScore = onCountScore;
     this.lockButton.on("pointerup", () => {
+      console.log("pointer_up event registered!");
       this.onLockButtonClick(this.countNewTiles());
       this.lock();
       this.onCountScore(this.score());
+    });
+
+    // Highlight on mouseover
+    this.lockButton.on("pointerover", () => {
+      this.highlightRect = new Phaser.GameObjects.Graphics(this.scene);
+      this.highlightRect.fillStyle(0xffffff, 0.3);
+      this.highlightRect.fillRoundedRect(30 - 16, 70 - 16, 32, 32, 3);
+      this.add(this.highlightRect);
+    });
+    this.lockButton.on("pointerout", () => {
+      this.highlightRect.destroy();
+    });
+    this.lockButton.on("pointerup", () => {
+      this.highlightRect.destroy();
     });
   }
 
