@@ -309,6 +309,7 @@ const config: Phaser.Types.Core.GameConfig = {
   dom: {
     createContainer: true,
   },
+  parent: "parent",
 };
 
 const game = new Phaser.Game(config);
