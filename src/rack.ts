@@ -109,7 +109,6 @@ export default class Rack extends Phaser.GameObjects.Container {
         vowelInTiles = true;
       }
     }
-    console.log("Vowel in tiles: " + vowelInTiles);
     return vowelInTiles;
   }
 }

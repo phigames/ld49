@@ -82,7 +82,6 @@ export default class Column extends Phaser.GameObjects.Container {
     this.onLockButtonClick = onLockButtonClick;
     this.onCountScore = onCountScore;
     this.lockButton.on("pointerup", () => {
-      console.log("pointer_up event registered!");
       this.onLockButtonClick(this.countNewTiles());
       this.lock();
       this.onCountScore(this.score());
