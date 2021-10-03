@@ -33,9 +33,10 @@ export default class Column extends Phaser.GameObjects.Container {
       this.scene,
       1,
       -64,
-      "column-crumbly"
+      "column"
     );
     this.add(this.background);
+    this.makeColShadowy();
 
     this.lockButton = new Phaser.GameObjects.Image(
       this.scene,
@@ -231,9 +232,9 @@ export default class Column extends Phaser.GameObjects.Container {
   checkCorrectWord() {
     this.isWord = this.dictionary.wordInDict(this.getWordString());
     if (this.isWord) {
-      this.background.setTexture("column");
+      this.makeColStable();
     } else {
-      this.background.setTexture("column-crumbly");
+      this.makeColUnstable();
     }
     this.updateLockButton();
   }
@@ -244,8 +245,25 @@ export default class Column extends Phaser.GameObjects.Container {
       if (!tile.rackable) {
         tile.setTint(0xe0e0e0);
       } else {
-        tile.setTint(0xffffff);
+        tile.clearTint();
       }
     }
+  }
+
+  makeColShadowy() {
+    this.background.setTint(0x696969);
+    this.background.setAlpha(0.5);
+  }
+
+  makeColStable() {
+    this.background.setTexture("column");
+    this.background.clearAlpha();
+    this.background.clearTint();
+  }
+
+  makeColUnstable() {
+    this.background.setTexture("column-crumbly");
+    this.background.clearAlpha();
+    this.background.clearTint();
   }
 }
