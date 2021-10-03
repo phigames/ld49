@@ -181,8 +181,9 @@ export default class Column extends Phaser.GameObjects.Container {
   updateLockButton() {
     if (this.isWord) {
       this.lockButton.setVisible(true);
+      this.bringToTop(this.lockButton);
       if (this.isLocked) {
-        this.lockButton.setTexture("letter-O");
+        this.lockButton.setVisible(false);
         this.scene.input.disable(this.lockButton);
         for (const tile of this.tiles) {
           tile.lock();

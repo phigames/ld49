@@ -4,6 +4,7 @@ import * as C from "./constants";
 import { Dictionary } from "./dictionary";
 import { getLeaderboard } from "./leaderboard";
 import Rack from "./rack";
+import TextBox from "./textbox";
 import Tile from "./tile";
 import Endscreen from "./endscreen";
 
@@ -19,6 +20,7 @@ export default class Game extends Phaser.Scene {
   dictionary: Dictionary;
   score: number;
   scoreText: Phaser.GameObjects.Text;
+  tutorial: TextBox;
 
   constructor() {
     super("game");
@@ -120,6 +122,24 @@ export default class Game extends Phaser.Scene {
       .setOrigin(0.5);
     this.updateLevelDisplay();
 
+    const messages = [
+      "Make words in the pillars to\n",
+      "to prevent the temple from\n",
+      "collapsing!\n",
+      "\n",
+      "Earthquakes will delete letters\n",
+      "and make pillar unstable! Fix\n",
+      "them fast before they collapse\n",
+      "in the next quake.",
+    ];
+    let message = "";
+    for (const elem of messages) {
+      message = message + elem;
+    }
+
+    this.tutorial = new TextBox(this, message, 30, 40);
+    this.add.existing(this.tutorial);
+
     // Test functions for removing/adding rack tiles (hehe)
     this.input.keyboard.on(
       "keydown-R",
@@ -168,6 +188,7 @@ export default class Game extends Phaser.Scene {
     if (this.clockState === "none") {
       if (this.columns.some((column) => column.isLocked === true)) {
         this.clockState = "running";
+        this.tutorial.destroy();
       }
     }
 

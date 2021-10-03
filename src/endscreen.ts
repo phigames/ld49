@@ -19,6 +19,7 @@ export default class Endscreen extends Phaser.Scene {
 
   preload() {
     this.load.image("background", "assets/background.png");
+    this.load.image("gameover", "assets/gameover.png");
     this.load.html("nameform", "assets/nameform.html");
   }
 
@@ -29,16 +30,23 @@ export default class Endscreen extends Phaser.Scene {
       "background"
     );
 
-    const scoreText = this.add
-      .text(320, 250, "Game Over \n Your score: " + this.score, {
-        fontFamily: C.FONT_FAMILY,
-        fontSize: "16px",
-        align: "center",
-        color: "black",
-        fontStyle: "bold",
-        backgroundColor: "white",
-      })
-      .setOrigin(0.5);
+    let gameover = this.add.image(0, -500, "gameover").setOrigin(0);
+    this.tweens.add({
+      targets: gameover,
+      y: 0,
+      duration: 1000,
+      ease: Phaser.Math.Easing.Quintic.In,
+    });
+    this.time.addEvent({
+      delay: 1000,
+      loop: false,
+      callback: () => {
+        this.cameras.main.shake(
+          C.EARTHQUAKE_DURATION * 1000,
+          C.EARTHQUAKE_INTENSITY
+        );
+      },
+    });
 
     var text = this.add.text(300, 10, "Please enter your name", {
       color: "white",
