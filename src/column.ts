@@ -123,6 +123,10 @@ export default class Column extends Phaser.GameObjects.Container {
   removeTile(index: number) {
     this.tiles[index].destroy();
     this.tiles.splice(index, 1);
+    // Auto-lock if no rackable tiles
+    if (!this.tiles.some((tile) => tile.rackable)) {
+      this.lock();
+    }
     this.updateTileCoords();
     this.checkCorrectWord();
   }
@@ -180,8 +184,10 @@ export default class Column extends Phaser.GameObjects.Container {
 
   updateLockButton() {
     if (this.isWord) {
-      this.lockButton.setVisible(true);
-      this.bringToTop(this.lockButton);
+      if (this.tiles.some((tile) => tile.rackable)) {
+        this.lockButton.setVisible(true);
+        this.bringToTop(this.lockButton);
+      }
       if (this.isLocked) {
         this.lockButton.setVisible(false);
         this.scene.input.disable(this.lockButton);
