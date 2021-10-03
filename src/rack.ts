@@ -7,7 +7,7 @@ export default class Rack extends Phaser.GameObjects.Container {
   updateColumnButtons: Function;
 
   constructor(scene: Phaser.Scene, updateColumnButtons: Function) {
-    super(scene, 320, 400);
+    super(scene, 321, 397);
 
     this.tiles = [];
     this.activeTileIndex = null;
@@ -47,9 +47,7 @@ export default class Rack extends Phaser.GameObjects.Container {
 
   removeTile(i: integer) {
     // Remove one element at index
-    // this.remove(this.tiles[i]);
     this.tiles[i].destroy();
-    console.log("tile destroyed.");
     this.tiles.splice(i, 1);
     this.updateTileCoords();
     this.resetActiveTile();

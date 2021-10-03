@@ -13,6 +13,7 @@ export default class Game extends Phaser.Scene {
   levelDisplay: Phaser.GameObjects.Text;
   level: number;
   dictionary: Dictionary;
+  clockState: "none" | "running" | "delay";
 
   constructor() {
     super("game");
@@ -27,6 +28,8 @@ export default class Game extends Phaser.Scene {
     this.load.image("column-crumbly", "assets/column-crumbly.png");
 
     this.load.json("wordList", "assets/words.json");
+    this.level = 0;
+    this.clockState = "none";
   }
 
   create() {
@@ -40,7 +43,6 @@ export default class Game extends Phaser.Scene {
     }
 
     this.rack = new Rack(this, () => {
-      console.log(this.columns);
       for (const column of this.columns) {
         if (this.rack !== undefined && this.rack.activeTileIndex !== null) {
           column.showAddButton();
@@ -79,13 +81,6 @@ export default class Game extends Phaser.Scene {
         fontStyle: "bold",
       })
       .setOrigin(0.5);
-    const timedEvent = this.time.addEvent({
-      delay: 1000,
-      callback: this.onClockTick,
-      callbackScope: this,
-      loop: true,
-    });
-    this.updateClock();
 
     this.level = 0;
     this.levelDisplay = this.add
@@ -125,7 +120,7 @@ export default class Game extends Phaser.Scene {
     this.input.keyboard.on(
       "keydown-A",
       function () {
-        this.rack.fill();
+        this.rack.fill(8);
       },
       this
     );
@@ -138,9 +133,29 @@ export default class Game extends Phaser.Scene {
     );
   }
 
+  update() {
+    if (this.clockState === "none") {
+      if (this.columns.some((column) => column.isLocked === true)) {
+        this.clockState = "running";
+      }
+    }
+
+    // clock
+    if (this.clockState == "running") {
+      const timedEvent = this.time.addEvent({
+        delay: 1000,
+        callback: this.onClockTick,
+        callbackScope: this,
+        loop: true,
+      });
+      this.clockState = "delay";
+      this.updateClock();
+    }
+  }
+
   onClockTick() {
     this.clockTime -= 1; // One second
-    if (this.clockTime <= 0) {
+    if (this.clockTime == 0) {
       this.cameras.main.shake(
         C.EARTHQUAKE_DURATION * 1000,
         C.EARTHQUAKE_INTENSITY
@@ -169,13 +184,14 @@ export default class Game extends Phaser.Scene {
         }
       }
       this.rack.fill(8);
-      this.clockTime = C.TIME_PER_LEVEL + C.EARTHQUAKE_DURATION;
+    } else if (this.clockTime <= -C.PAUSE_AFTER_EARTHQUAKE) {
+      this.clockTime = C.TIME_PER_LEVEL;
     }
     this.updateClock();
   }
 
   updateClock() {
-    this.clock.setText(this.clockTime.toString());
+    this.clock.setText(this.clockTime > 0 ? this.clockTime.toString() : "");
   }
 
   updateLevelDisplay() {
@@ -198,7 +214,10 @@ export default class Game extends Phaser.Scene {
   }
 
   addRackTileToColumn(i: number) {
-    if (this.rack.activeTileIndex !== null) {
+    if (
+      this.rack.activeTileIndex !== null &&
+      this.columns[i].tiles.length < 8
+    ) {
       // index of currently selected tile
       const index = this.rack.activeTileIndex;
       // letter of currently selected tile
