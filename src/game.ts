@@ -123,6 +123,8 @@ export default class Game extends Phaser.Scene {
       [],
       this.dictionary,
       () => this.addRackTileToColumn(i),
+      //TODO provide fill function
+      () => {},
       (tile) => this.moveTileToRack(column, tile)
     );
     this.columns.splice(i, 0, column);

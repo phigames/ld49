@@ -9,6 +9,7 @@ export default class Column extends Phaser.GameObjects.Container {
   addButton: Phaser.GameObjects.Image;
   lockButton: Phaser.GameObjects.Image;
   onAddButtonClick: Function;
+  onLockButtonClick: Function;
   onTileClick: Function;
   isWord: boolean;
   isLocked: boolean;
@@ -19,6 +20,7 @@ export default class Column extends Phaser.GameObjects.Container {
     letters: string[],
     dictionary: Dictionary,
     onAddButtonClick,
+    onLockButtonClick,
     onTileClick
   ) {
     super(scene, 70 + index * 100, 239);
@@ -65,10 +67,18 @@ export default class Column extends Phaser.GameObjects.Container {
     this.onAddButtonClick = onAddButtonClick;
     this.onTileClick = onTileClick;
     this.addButton.on("pointerdown", this.onAddButtonClick);
+
+    this.add(this.lockButton);
+    this.onLockButtonClick = onLockButtonClick;
+    this.lockButton.on("pointerdown", () => {
+      this.onLockButtonClick(this.countNewTiles());
+      this.lock();
+    });
   }
 
   addTile(tile: Tile) {
     tile.removeAllListeners();
+    this.unlock();
     this.tiles.push(tile);
     this.add(tile);
     this.updateTileCoords();
@@ -173,6 +183,13 @@ export default class Column extends Phaser.GameObjects.Container {
     }
   }
 
+  lock() {
+    this.isLocked = true;
+    this.updateLockButton();
+    this.lockTiles();
+    this.tintLockedTiles();
+  }
+
   updateLockButton() {
     if (this.isWord) {
       this.lockButton.setVisible(true);
@@ -194,6 +211,24 @@ export default class Column extends Phaser.GameObjects.Container {
     }
   }
 
+  lockTiles() {
+    for (const tile of this.tiles) {
+      tile.rackable = false;
+    }
+  }
+
+  countNewTiles() {
+    let i = 0;
+    for (const tile of this.tiles) {
+      if (tile.rackable) {
+        i++;
+      }
+    }
+    this.lockTiles();
+    console.log(i);
+    return i;
+  }
+
   getWordString() {
     let word = "";
     for (const tile of this.tiles) {
@@ -210,5 +245,16 @@ export default class Column extends Phaser.GameObjects.Container {
       this.background.setTexture("column-crumbly");
     }
     this.updateLockButton();
+  }
+
+  tintLockedTiles() {
+    for (let i = 0; i < this.tiles.length; i++) {
+      const tile = this.tiles[i];
+      if (!tile.rackable) {
+        tile.setTint(0xe0e0e0);
+      } else {
+        tile.setTint(0xffffff);
+      }
+    }
   }
 }
