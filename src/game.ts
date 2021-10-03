@@ -178,6 +178,7 @@ export default class Game extends Phaser.Scene {
 
   update() {
     if (this.clockState === "none") {
+      // console.log(this.columns.map((c) => c.isLocked));
       if (
         this.columns.some(
           (column) => column.isLocked === true && column.tiles.length > 0
@@ -215,7 +216,6 @@ export default class Game extends Phaser.Scene {
         const randomIndex = Math.floor(Math.random() * column.tiles.length);
         if (column.isWord) {
           column.removeTile(randomIndex);
-          column.unlock();
         } else {
           // TODO Animation for Earthquake Tiles
           for (const tile of column.tiles) {
@@ -266,9 +266,18 @@ export default class Game extends Phaser.Scene {
       this.dictionary,
       () => this.addRackTileToColumn(i),
       //TODO provide fill function
-      (numRackableTiles) => this.rack.fill(numRackableTiles),
+      (numRackableTiles) => {console.log(numRackableTiles, "numRackableTiles"); this.rack.fill(numRackableTiles)},
       (tile) => this.moveTileToRack(column, tile),
       (score) => {
+        const scoreAnimation = this.add.text(column.x, column.y + column.tiles[0].y, `+${score}`);
+        this.tweens.add({
+          targets: scoreAnimation,
+          props: {y: scoreAnimation.y - 50, opacity: 0},
+          duration: 700,
+          onComplete: () => {
+            scoreAnimation.destroy();
+          }
+        })
         this.score += score;
         this.updateScoreText();
       }
@@ -287,9 +296,8 @@ export default class Game extends Phaser.Scene {
       // letter of currently selected tile
       const letter = this.rack.tiles[index].letter;
       let tile = new Tile(this, letter, 0, 0);
-      this.columns[i].addTile(tile);
       this.rack.removeTile(index);
-      this.columns[i].unlock();
+      this.columns[i].addTile(tile);
     }
   }
 

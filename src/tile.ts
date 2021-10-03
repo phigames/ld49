@@ -10,6 +10,7 @@ export default class Tile extends Phaser.GameObjects.Image {
   }
 
   lock() {
+    this.rackable = false;
     this.scene.input.disable(this);
   }
 

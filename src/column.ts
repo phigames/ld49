@@ -8,9 +8,8 @@ export default class Column extends Phaser.GameObjects.Container {
   dragging: boolean;
   dictionary: Dictionary;
   addButton: Phaser.GameObjects.Image;
-  lockButton: Phaser.GameObjects.Image;
   onAddButtonClick: Function;
-  onLockButtonClick: Function;
+  onLock: Function;
   onCountScore: Function;
   onTileClick: Function;
   isWord: boolean;
@@ -24,7 +23,7 @@ export default class Column extends Phaser.GameObjects.Container {
     letters: string[],
     dictionary: Dictionary,
     onAddButtonClick,
-    onLockButtonClick,
+    onLock,
     onTileClick,
     onCountScore
   ) {
@@ -32,6 +31,7 @@ export default class Column extends Phaser.GameObjects.Container {
     this.tiles = [];
     this.dragging = false;
     this.isWord = false;
+    this.isLocked = false;
     this.dictionary = dictionary;
 
     this.background = new Phaser.GameObjects.Image(
@@ -43,18 +43,11 @@ export default class Column extends Phaser.GameObjects.Container {
     this.add(this.background);
     this.makeColShadowy();
 
-    this.lockButton = new Phaser.GameObjects.Image(this.scene, 30, 70, "ok2");
-    this.add(this.lockButton);
-    this.lockButton.on("pointerup", () => {
-      this.isLocked = true;
-      this.updateLockButton();
-    });
-
     letters.forEach((l, i) => {
       let tile = new Tile(scene, l, 0, 0);
       this.addTile(tile);
     });
-    this.updateLockButton();
+    this.updateLock();
 
     this.addButton = new Phaser.GameObjects.Image(this.scene, 0, 100, "arrow");
     this.add(this.addButton);
@@ -78,29 +71,8 @@ export default class Column extends Phaser.GameObjects.Container {
       this.highlightRect.destroy();
     });
 
-    this.add(this.lockButton);
-    this.onLockButtonClick = onLockButtonClick;
+    this.onLock = onLock;
     this.onCountScore = onCountScore;
-    this.lockButton.on("pointerup", () => {
-      console.log("pointer_up event registered!");
-      this.onLockButtonClick(this.countNewTiles());
-      this.lock();
-      this.onCountScore(this.score());
-    });
-
-    // Highlight on mouseover
-    this.lockButton.on("pointerover", () => {
-      this.highlightRect = new Phaser.GameObjects.Graphics(this.scene);
-      this.highlightRect.fillStyle(0xffffff, 0.3);
-      this.highlightRect.fillRoundedRect(30 - 16, 70 - 16, 32, 32, 3);
-      this.add(this.highlightRect);
-    });
-    this.lockButton.on("pointerout", () => {
-      this.highlightRect.destroy();
-    });
-    this.lockButton.on("pointerup", () => {
-      this.highlightRect.destroy();
-    });
   }
 
   addTile(tile: Tile) {
@@ -205,47 +177,38 @@ export default class Column extends Phaser.GameObjects.Container {
   }
 
   unlock() {
+    console.log("unlocking");
     this.isLocked = false;
-    this.updateLockButton();
     for (const tile of this.tiles) {
       tile.unlock();
     }
   }
 
   lock() {
-    this.isLocked = true;
-    this.updateLockButton();
+    console.log("locking");
+    if (!this.isLocked) {
+      this.isLocked = true;
+      const n = this.countNewTiles();
+      console.log(n, "new tiles");
+      this.onLock(n);
+      this.onCountScore(this.score());
+    }
     this.lockTiles();
     this.tintLockedTiles();
   }
 
-  updateLockButton() {
+  updateLock() {
+    console.log("updateLock");
     if (this.isWord) {
       if (this.tiles.some((tile) => tile.rackable)) {
-        this.lockButton.setVisible(true);
-        this.bringToTop(this.lockButton);
+        this.lock();
       }
-      if (this.isLocked) {
-        this.lockButton.setVisible(false);
-        this.scene.input.disable(this.lockButton);
-        for (const tile of this.tiles) {
-          tile.lock();
-        }
-      } else {
-        this.lockButton.setTexture("ok2");
-        this.lockButton.setInteractive({ cursor: "pointer" });
-        for (const tile of this.tiles) {
-          tile.unlock();
-        }
-      }
-    } else {
-      this.lockButton.setVisible(false);
     }
   }
 
   lockTiles() {
     for (const tile of this.tiles) {
-      tile.rackable = false;
+      tile.lock();
     }
   }
 
@@ -256,7 +219,6 @@ export default class Column extends Phaser.GameObjects.Container {
         i++;
       }
     }
-    this.lockTiles();
     return i;
   }
 
@@ -275,7 +237,7 @@ export default class Column extends Phaser.GameObjects.Container {
     } else {
       this.makeColUnstable();
     }
-    this.updateLockButton();
+    this.updateLock();
   }
 
   tintLockedTiles() {

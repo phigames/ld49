@@ -24,7 +24,8 @@ export default class Rack extends Phaser.GameObjects.Container {
 
   addTile(letter: string) {
     if (this.tiles.length >= 8) {
-      return false;
+      console.log("too many tiles!");
+      return
     } else {
       const newTile = new Tile(this.scene, letter, 0, 0);
       this.tiles.push(newTile);
@@ -41,7 +42,6 @@ export default class Rack extends Phaser.GameObjects.Container {
         },
         this
       );
-      return true;
     }
   }
 
@@ -72,7 +72,9 @@ export default class Rack extends Phaser.GameObjects.Container {
 
   fill(tilesToFill: integer) {
     // Fill rack with random letter tiles, ensuring at least one vowel
-    const nOfTiles = Math.min(8 - this.tiles.length, tilesToFill);
+    // const nOfTiles = Math.min(8 - this.tiles.length, tilesToFill);
+    const nOfTiles = tilesToFill;
+    console.log("nOfTiles", nOfTiles)
 
     for (let i = 0; i < nOfTiles; i++) {
       const randomIndex = Math.floor(Math.random() * C.LETTERS.length);
@@ -100,7 +102,6 @@ export default class Rack extends Phaser.GameObjects.Container {
         vowelInTiles = true;
       }
     }
-    console.log("Vowel in tiles: " + vowelInTiles);
     return vowelInTiles;
   }
 }
