@@ -36,12 +36,14 @@ export default class Game extends Phaser.Scene {
     this.load.image("arrow", "assets/arrow.png");
     this.load.image("ok1", "assets/ok1.png");
     this.load.image("ok2", "assets/ok2.png");
+    this.load.audio("music", "assets/music.ogg");
     this.load.json("wordList", "assets/words.json");
     this.load.html("nameform", "assets/nameform.html");
   }
 
   create() {
-    getLeaderboard().then((data) => console.log(data));
+    this.sound.pauseOnBlur = false;
+
     this.add.image(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2, "background");
     const data = this.cache.json.get("wordList");
     this.dictionary = new Dictionary(data);
@@ -75,7 +77,7 @@ export default class Game extends Phaser.Scene {
 
     this.clockTime = C.TIME_PER_LEVEL;
     this.clock = this.add
-      .text(50, 380, "", {
+      .text(55, 380, "", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "30px",
         align: "center",
@@ -83,7 +85,7 @@ export default class Game extends Phaser.Scene {
       })
       .setOrigin(0.5);
     this.add
-      .text(50, 404, "sec until", {
+      .text(60, 404, "sec until", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "16px",
         align: "center",
@@ -92,7 +94,7 @@ export default class Game extends Phaser.Scene {
       })
       .setOrigin(0.5);
     this.add
-      .text(50, 420, "earthquake", {
+      .text(60, 420, "earthquake", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "16px",
         align: "center",
@@ -111,7 +113,7 @@ export default class Game extends Phaser.Scene {
       })
       .setOrigin(0.5);
     this.add
-      .text(590, 410, "earthquakes", {
+      .text(594, 410, "earthquakes", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "16px",
         align: "center",
@@ -185,6 +187,7 @@ export default class Game extends Phaser.Scene {
       ) {
         this.clockState = "running";
         this.tutorial.destroy();
+        this.sound.play("music");
       }
     }
 
@@ -205,7 +208,7 @@ export default class Game extends Phaser.Scene {
     this.clockTime -= 1; // One second
     if (this.clockTime == 0) {
       this.cameras.main.shake(
-        C.EARTHQUAKE_DURATION * 1000,
+        C.EARTHQUAKE_DURATION * 1500,
         C.EARTHQUAKE_INTENSITY
       );
       for (let i = 0; i < this.columns.length; i++) {
@@ -242,6 +245,7 @@ export default class Game extends Phaser.Scene {
       this.updateLevelDisplay();
     } else if (this.clockTime <= -C.PAUSE_AFTER_EARTHQUAKE) {
       this.clockTime = C.TIME_PER_LEVEL;
+      this.sound.play("music");
     }
     this.updateClock();
   }
@@ -284,7 +288,7 @@ export default class Game extends Phaser.Scene {
         );
         this.tweens.add({
           targets: scoreAnimation,
-          props: { y: scoreAnimation.y - 50, opacity: 0 },
+          props: { y: scoreAnimation.y - 50, alpha: 0 },
           duration: 700,
           onComplete: () => {
             scoreAnimation.destroy();
@@ -328,7 +332,6 @@ export default class Game extends Phaser.Scene {
       delay: 2000,
       loop: false,
       callback: () => {
-        alert("WIN");
         for (const column of this.columns) {
           column.lock();
         }
@@ -336,53 +339,81 @@ export default class Game extends Phaser.Scene {
       },
     });
 
+    const winText = this.add
+      .text(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2, "YOU DID IT!", {
+        fontFamily: C.FONT_FAMILY,
+        fontSize: "70px",
+        fontStyle: "bold",
+        color: "#d29465",
+      })
+      .setOrigin(0.5);
+    winText.setAlpha(0);
+
     const nameform = this.add
       .dom(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2)
       .createFromCache("nameform");
+    nameform.setAlpha(0);
     const usernameField = nameform.getChildByName("username");
     const form = nameform.getChildByID("nameform");
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       const username: string = usernameField["value"];
       if (username.trim() !== "") {
-        postScore(username, this.score).then(() => {
-          nameform.destroy();
-          this.add
-            .text(
-              C.SCREEN_WIDTH / 2,
-              C.SCREEN_HEIGHT / 2 - 200,
-              "Leaderboard",
-              {
-                fontFamily: C.FONT_FAMILY,
-                fontSize: "30px",
-                fontStyle: "bold",
-                color: "black",
-                backgroundColor: "white",
-              }
-            )
-            .setOrigin(0.5, 0);
-          const leaderboard = this.add
-            .text(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2 - 150, "Loading...", {
-              fontFamily: C.FONT_FAMILY,
-              fontSize: "25px",
-              color: "black",
-              backgroundColor: "white",
-            })
-            .setOrigin(0.5, 0);
-          getLeaderboard().then(({ runs }) => {
-            const text = runs
-              .map((run) => `${run.username}: ${run.score}`)
-              .join("\n");
-            console.log(text);
-            leaderboard.setText(text);
+        usernameField["disabled"] = true;
+        postScore(username, this.score)
+          .then(() => {
+            nameform.destroy();
+            this.add
+              .text(
+                C.SCREEN_WIDTH / 2,
+                C.SCREEN_HEIGHT / 2 - 200,
+                "Leaderboard",
+                {
+                  fontFamily: C.FONT_FAMILY,
+                  fontSize: "30px",
+                  fontStyle: "bold",
+                  color: "black",
+                  backgroundColor: "white",
+                }
+              )
+              .setOrigin(0.5, 0);
+            const leaderboard = this.add
+              .text(
+                C.SCREEN_WIDTH / 2,
+                C.SCREEN_HEIGHT / 2 - 150,
+                "Loading...",
+                {
+                  fontFamily: C.FONT_FAMILY,
+                  fontSize: "25px",
+                  color: "black",
+                  backgroundColor: "white",
+                }
+              )
+              .setOrigin(0.5, 0);
+            getLeaderboard().then(({ runs }) => {
+              const text = runs
+                .map((run) => `${run.username}: ${run.score}`)
+                .join("\n");
+              console.log(text);
+              leaderboard.setText(text);
+            });
+          })
+          .catch(() => {
+            usernameField["disabled"] = false;
+            usernameField["value"] = "ERROR (please try again)";
           });
-        });
       }
     });
 
     this.tweens.add({
       targets: nameform,
-      y: 300,
+      props: { y: 300, alpha: 1 },
+      duration: 3000,
+      ease: "Power3",
+    });
+    this.tweens.add({
+      targets: winText,
+      props: { y: 200, alpha: 1 },
       duration: 3000,
       ease: "Power3",
     });
