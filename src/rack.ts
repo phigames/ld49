@@ -33,7 +33,7 @@ export default class Rack extends Phaser.GameObjects.Container {
 
       // Add event listener
       newTile.on(
-        "pointerdown",
+        "pointerup",
         () => {
           this.activeTileIndex = this.tiles.indexOf(newTile);
           this.tintActiveTile();
