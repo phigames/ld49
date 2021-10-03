@@ -31,7 +31,9 @@ export default class Game extends Phaser.Scene {
     this.load.image("background", "assets/background.png");
     this.load.image("column", "assets/column.png");
     this.load.image("column-crumbly", "assets/column-crumbly.png");
-
+    this.load.image("arrow", "assets/arrow.png");
+    this.load.image("ok1", "assets/ok1.png");
+    this.load.image("ok2", "assets/ok2.png");
     this.load.json("wordList", "assets/words.json");
     this.level = 0;
     this.clockState = "none";
@@ -255,7 +257,7 @@ export default class Game extends Phaser.Scene {
   }
 
   updateLevelDisplay() {
-    this.levelDisplay.setText(`${this.level} / ${C.NUMBER_OF_LEVELS}`);
+    this.levelDisplay.setText(` ${this.level}    ${C.NUMBER_OF_LEVELS}`);
   }
 
   updateScoreText() {
@@ -325,6 +327,10 @@ const config: Phaser.Types.Core.GameConfig = {
   render: {
     pixelArt: true,
   },
+  dom: {
+    createContainer: true,
+  },
+  parent: "parent",
 };
 
 const game = new Phaser.Game(config);
