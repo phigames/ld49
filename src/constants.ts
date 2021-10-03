@@ -7,6 +7,9 @@ export const FONT_FAMILY = "Neucha, sans-serif";
 export const SCREEN_WIDTH = 640;
 export const SCREEN_HEIGHT = 480;
 
+// export const LEADERBOARD_URL = "https://ld49-leaderboard.herokuapp.com";
+export const LEADERBOARD_URL = "http://localhost:8000";
+
 export const LETTER_SCORES: { [letter: string]: number } = {};
 LETTER_SCORES["A"] = 1;
 LETTER_SCORES["B"] = 3;

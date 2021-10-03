@@ -2,7 +2,7 @@ import "phaser";
 import Column from "./column";
 import * as C from "./constants";
 import { Dictionary } from "./dictionary";
-import { getLeaderboard } from "./leaderboard";
+import { getLeaderboard, postScore } from "./leaderboard";
 import Rack from "./rack";
 import TextBox from "./textbox";
 import Tile from "./tile";
@@ -37,8 +37,7 @@ export default class Game extends Phaser.Scene {
     this.load.image("ok1", "assets/ok1.png");
     this.load.image("ok2", "assets/ok2.png");
     this.load.json("wordList", "assets/words.json");
-    this.level = 0;
-    this.clockState = "none";
+    this.load.html("nameform", "assets/nameform.html");
   }
 
   create() {
@@ -122,15 +121,17 @@ export default class Game extends Phaser.Scene {
       .setOrigin(0.5);
     this.updateLevelDisplay();
 
+    this.clockState = "none";
+
     const messages = [
-      "Make words in the pillars to\n",
-      "to prevent the temple from\n",
-      "collapsing!\n",
-      "\n",
-      "Earthquakes will delete letters\n",
-      "and make pillar unstable! Fix\n",
-      "them fast before they collapse\n",
-      "in the next quake.",
+      // "Make words in the pillars to\n",
+      // "to prevent the temple from\n",
+      // "collapsing!\n",
+      // "\n",
+      // "Earthquakes will delete letters\n",
+      // "and make pillar unstable! Fix\n",
+      // "them fast before they collapse\n",
+      // "in the next quake.",
     ];
     let message = "";
     for (const elem of messages) {
@@ -180,8 +181,6 @@ export default class Game extends Phaser.Scene {
       },
       this
     );
-
-    //
   }
 
   update() {
@@ -237,7 +236,10 @@ export default class Game extends Phaser.Scene {
       this.rack.fill(8);
       this.level++;
       // Winning condition
-      if (this.level >= C.NUMBER_OF_LEVELS && this.columns.some((column) => column.tiles.length > 0)) {
+      if (
+        this.level >= C.NUMBER_OF_LEVELS &&
+        this.columns.some((column) => column.tiles.length > 0)
+      ) {
         this.win();
       }
       this.updateLevelDisplay();
@@ -304,6 +306,8 @@ export default class Game extends Phaser.Scene {
 
   win() {
     this.timer.destroy();
+    this.clockTime = -1;
+
     this.time.addEvent({
       delay: 2000,
       loop: false,
@@ -314,6 +318,55 @@ export default class Game extends Phaser.Scene {
         }
         this.add.text(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, "You won!");
       },
+    });
+
+    const nameform = this.add.dom(300, 300).createFromCache("nameform");
+    const usernameField = nameform.getChildByName("username");
+    const form = nameform.getChildByID("nameform");
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const username: string = usernameField["value"];
+      if (username.trim() !== "") {
+        postScore(username, this.score).then(() => {
+          nameform.destroy();
+          this.add
+            .text(
+              C.SCREEN_WIDTH / 2,
+              C.SCREEN_HEIGHT / 2 - 200,
+              "Leaderboard",
+              {
+                fontFamily: C.FONT_FAMILY,
+                fontSize: "30px",
+                fontStyle: "bold",
+                color: "black",
+                backgroundColor: "white",
+              }
+            )
+            .setOrigin(0.5, 0);
+          const leaderboard = this.add
+            .text(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2 - 150, "Loading...", {
+              fontFamily: C.FONT_FAMILY,
+              fontSize: "25px",
+              color: "black",
+              backgroundColor: "white",
+            })
+            .setOrigin(0.5, 0);
+          getLeaderboard().then(({ runs }) => {
+            const text = runs
+              .map((run) => `${run.username}: ${run.score}`)
+              .join("\n");
+            console.log(text);
+            leaderboard.setText(text);
+          });
+        });
+      }
+    });
+
+    this.tweens.add({
+      targets: nameform,
+      y: 300,
+      duration: 3000,
+      ease: "Power3",
     });
   }
 
