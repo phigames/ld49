@@ -7,7 +7,7 @@ export default class Rack extends Phaser.GameObjects.Container {
   updateColumnButtons: Function;
 
   constructor(scene: Phaser.Scene, updateColumnButtons: Function) {
-    super(scene, 319, 397);
+    super(scene, 321, 397);
 
     this.tiles = [];
     this.activeTileIndex = null;
