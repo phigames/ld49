@@ -6,6 +6,14 @@ export default class Tile extends Phaser.GameObjects.Image {
     super(scene, x, y, `letter-${letter}`);
     this.letter = letter;
     this.rackable = true;
+    this.unlock();
+  }
+
+  lock() {
+    this.scene.input.disable(this);
+  }
+
+  unlock() {
     this.setInteractive({ useHandCursor: true });
   }
 }
