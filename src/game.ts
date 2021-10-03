@@ -99,7 +99,7 @@ export default class Game extends Phaser.Scene {
         this.rack.resetActiveTile();
         const randomIndex = Math.floor(Math.random() * column.tiles.length);
         if (column.isWord) {
-          column.removeTile(randomIndex, true);
+          column.removeTile(randomIndex);
           column.unlock();
         } else {
           // TODO Animation for Earthquake Tiles
