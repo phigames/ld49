@@ -117,8 +117,13 @@ export default class Game extends Phaser.Scene {
   }
 
   addColumn(i: number) {
-    const column = new Column(this, i, ["A", "B", "C"], this.dictionary, () =>
-      this.addRackTileToColumn(i)
+    const column = new Column(
+      this,
+      i,
+      ["A", "B", "C"],
+      this.dictionary,
+      () => this.addRackTileToColumn(i),
+      (tile) => this.moveTileToRack(column, tile)
     );
     this.columns.splice(i, 0, column);
     this.add.existing(column);
@@ -136,10 +141,10 @@ export default class Game extends Phaser.Scene {
     }
   }
 
-  moveTileToRack(column: Column, index: number) {
-    const tile = column.tiles[index];
-    if (tile.rackable) {
-      column.removeTile(index);
+  moveTileToRack(column: Column, tile: Tile) {
+    const tileIndex = column.tiles.indexOf(tile);
+    if (tile.rackable && this.rack.tiles.length < 8) {
+      column.removeTile(tileIndex);
       this.rack.addTile(tile.letter);
     }
   }
