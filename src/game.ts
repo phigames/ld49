@@ -36,20 +36,24 @@ export default class Game extends Phaser.Scene {
     const data = this.cache.json.get("wordList");
     this.dictionary = new Dictionary(data);
 
+    this.columns = [];
+    for (let i = 0; i < 6; i++) {
+      this.addColumn(i);
+    }
+
     this.rack = new Rack(this, () => {
+      console.log(this.columns);
       for (const column of this.columns) {
-        if (this.rack.activeTileIndex !== null) {
+        if (this.rack !== undefined && this.rack.activeTileIndex !== null) {
           column.showAddButton();
         } else {
           column.hideAddButton();
         }
       }
     });
+    this.rack.fill(8);
     this.add.existing(this.rack);
-    this.columns = [];
-    for (let i = 0; i < 6; i++) {
-      this.addColumn(i);
-    }
+
     this.clockTime = C.TIME_PER_LEVEL;
     this.clock = this.add.text(600, 32, this.clockTime.toString());
     const timedEvent = this.time.addEvent({
@@ -93,6 +97,7 @@ export default class Game extends Phaser.Scene {
   onClockTick() {
     this.clockTime -= 1; // One second
     if (this.clockTime <= 0) {
+      this.cameras.main.shake(C.EARTHQUAKE_DURATION * 1000);
       for (let i = 0; i < this.columns.length; i++) {
         const column = this.columns[i];
         column.hideAddButton();
@@ -111,7 +116,7 @@ export default class Game extends Phaser.Scene {
           column.destroy(true);
         }
       }
-      this.clockTime = C.TIME_PER_LEVEL;
+      this.clockTime = C.TIME_PER_LEVEL + C.EARTHQUAKE_DURATION;
     }
     this.clock.setText(this.clockTime.toString());
   }
@@ -120,9 +125,11 @@ export default class Game extends Phaser.Scene {
     const column = new Column(
       this,
       i,
-      ["A", "B", "C"],
+      [],
       this.dictionary,
       () => this.addRackTileToColumn(i),
+      //TODO provide fill function
+      () => {},
       (tile) => this.moveTileToRack(column, tile)
     );
     this.columns.splice(i, 0, column);
@@ -138,6 +145,7 @@ export default class Game extends Phaser.Scene {
       let tile = new Tile(this, letter, 0, 0);
       this.columns[i].addTile(tile);
       this.rack.removeTile(index);
+      this.columns[i].unlock();
     }
   }
 
