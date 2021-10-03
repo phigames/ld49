@@ -13,7 +13,6 @@ export default class Gameover extends Phaser.Scene {
   preload() {
     this.load.image("background", "assets/background.png");
     this.load.image("gameover", "assets/gameover.png");
-    this.load.html("nameform", "assets/nameform.html");
     for (const letter of Array.from(new Set(C.LETTERS))) {
       this.load.image(`letter-${letter}`, `assets/letter-${letter}.png`);
     }
@@ -52,7 +51,7 @@ export default class Gameover extends Phaser.Scene {
     });
 
     this.add
-      .text(320, 300, "Click spacebar to try again", {
+      .text(320, 300, "Press spacebar to try again", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "25px",
         align: "center",

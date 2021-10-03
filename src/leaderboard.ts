@@ -1,7 +1,7 @@
 import * as C from "./constants";
 
-export function postScore(username: string, score: number) {
-  fetch(C.LEADERBOARD_URL + "/score/", {
+export async function postScore(username: string, score: number): Promise<void> {
+  await fetch(C.LEADERBOARD_URL + "/score/", {
     method: "POST",
     body: JSON.stringify({ username, score }),
   });

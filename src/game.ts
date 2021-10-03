@@ -2,6 +2,7 @@ import "phaser";
 import Column from "./column";
 import * as C from "./constants";
 import { Dictionary } from "./dictionary";
+import { getLeaderboard, postScore } from "./leaderboard";
 import Rack from "./rack";
 import TextBox from "./textbox";
 import Tile from "./tile";
@@ -13,6 +14,7 @@ export default class Game extends Phaser.Scene {
   clock: Phaser.GameObjects.Text;
   clockTime: number;
   clockState: "none" | "running" | "delay";
+  timer: Phaser.Time.TimerEvent;
   levelDisplay: Phaser.GameObjects.Text;
   level: number;
   dictionary: Dictionary;
@@ -35,11 +37,11 @@ export default class Game extends Phaser.Scene {
     this.load.image("ok1", "assets/ok1.png");
     this.load.image("ok2", "assets/ok2.png");
     this.load.json("wordList", "assets/words.json");
-    this.level = 0;
-    this.clockState = "none";
+    this.load.html("nameform", "assets/nameform.html");
   }
 
   create() {
+    getLeaderboard().then((data) => console.log(data));
     this.add.image(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2, "background");
     const data = this.cache.json.get("wordList");
     this.dictionary = new Dictionary(data);
@@ -119,6 +121,8 @@ export default class Game extends Phaser.Scene {
       .setOrigin(0.5);
     this.updateLevelDisplay();
 
+    this.clockState = "none";
+
     const messages = [
       "Make words in the pillars to\n",
       "to prevent the temple from\n",
@@ -175,8 +179,6 @@ export default class Game extends Phaser.Scene {
       },
       this
     );
-
-    //
   }
 
   update() {
@@ -189,7 +191,7 @@ export default class Game extends Phaser.Scene {
 
     // clock
     if (this.clockState == "running") {
-      const timedEvent = this.time.addEvent({
+      this.timer = this.time.addEvent({
         delay: 1000,
         callback: this.onClockTick,
         callbackScope: this,
@@ -207,11 +209,6 @@ export default class Game extends Phaser.Scene {
         C.EARTHQUAKE_DURATION * 1000,
         C.EARTHQUAKE_INTENSITY
       );
-      this.level++;
-      if (this.level >= C.NUMBER_OF_LEVELS) {
-        alert("WOW SUCH FINISH!!!11!");
-      }
-      this.updateLevelDisplay();
       for (let i = 0; i < this.columns.length; i++) {
         const column = this.columns[i];
         column.hideAddButton();
@@ -229,21 +226,21 @@ export default class Game extends Phaser.Scene {
           this.addColumn(i);
           column.destroy(true);
         }
-        // gameover Condition
+        // Losing condition
         if (!this.columns.some((column) => column.tiles.length > 0)) {
-          console.log("no pillars left");
-          this.time.addEvent({
-            delay: 2000,
-            loop: false,
-            callback: () => {
-              this.scene.start("gameover", {
-                score: this.score,
-              });
-            },
-          });
+          this.lose();
         }
       }
       this.rack.fill(8);
+      this.level++;
+      // Winning condition
+      if (
+        this.level >= C.NUMBER_OF_LEVELS &&
+        this.columns.some((column) => column.tiles.length > 0)
+      ) {
+        this.win();
+      }
+      this.updateLevelDisplay();
     } else if (this.clockTime <= -C.PAUSE_AFTER_EARTHQUAKE) {
       this.clockTime = C.TIME_PER_LEVEL;
     }
@@ -303,6 +300,85 @@ export default class Game extends Phaser.Scene {
       column.removeTile(tileIndex);
       this.rack.addTile(tile.letter);
     }
+  }
+
+  win() {
+    this.timer.destroy();
+    this.clockTime = -1;
+
+    this.time.addEvent({
+      delay: 2000,
+      loop: false,
+      callback: () => {
+        alert("WIN");
+        for (const column of this.columns) {
+          column.lock();
+        }
+        this.add.text(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, "You won!");
+      },
+    });
+
+    const nameform = this.add.dom(300, 300).createFromCache("nameform");
+    const usernameField = nameform.getChildByName("username");
+    const form = nameform.getChildByID("nameform");
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const username: string = usernameField["value"];
+      if (username.trim() !== "") {
+        postScore(username, this.score).then(() => {
+          nameform.destroy();
+          this.add
+            .text(
+              C.SCREEN_WIDTH / 2,
+              C.SCREEN_HEIGHT / 2 - 200,
+              "Leaderboard",
+              {
+                fontFamily: C.FONT_FAMILY,
+                fontSize: "30px",
+                fontStyle: "bold",
+                color: "black",
+                backgroundColor: "white",
+              }
+            )
+            .setOrigin(0.5, 0);
+          const leaderboard = this.add
+            .text(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2 - 150, "Loading...", {
+              fontFamily: C.FONT_FAMILY,
+              fontSize: "25px",
+              color: "black",
+              backgroundColor: "white",
+            })
+            .setOrigin(0.5, 0);
+          getLeaderboard().then(({ runs }) => {
+            const text = runs
+              .map((run) => `${run.username}: ${run.score}`)
+              .join("\n");
+            console.log(text);
+            leaderboard.setText(text);
+          });
+        });
+      }
+    });
+
+    this.tweens.add({
+      targets: nameform,
+      y: 300,
+      duration: 3000,
+      ease: "Power3",
+    });
+  }
+
+  lose() {
+    this.timer.destroy();
+    this.time.addEvent({
+      delay: 2000,
+      loop: false,
+      callback: () => {
+        this.scene.start("gameover", {
+          score: this.score,
+        });
+      },
+    });
   }
 }
 
