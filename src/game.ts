@@ -10,6 +10,8 @@ export default class Game extends Phaser.Scene {
   columns: Column[];
   clock: Phaser.GameObjects.Text;
   clockTime: number;
+  levelDisplay: Phaser.GameObjects.Text;
+  level: number;
   dictionary: Dictionary;
 
   constructor() {
@@ -28,11 +30,7 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
-    let background = this.add.image(
-      C.SCREEN_WIDTH / 2,
-      C.SCREEN_HEIGHT / 2,
-      "background"
-    );
+    this.add.image(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2, "background");
     const data = this.cache.json.get("wordList");
     this.dictionary = new Dictionary(data);
 
@@ -55,13 +53,59 @@ export default class Game extends Phaser.Scene {
     this.add.existing(this.rack);
 
     this.clockTime = C.TIME_PER_LEVEL;
-    this.clock = this.add.text(600, 32, this.clockTime.toString());
+    this.clock = this.add
+      .text(50, 380, "", {
+        fontFamily: C.FONT_FAMILY,
+        fontSize: "30px",
+        align: "center",
+        color: "black",
+      })
+      .setOrigin(0.5);
+    this.add
+      .text(50, 404, "sec until", {
+        fontFamily: C.FONT_FAMILY,
+        fontSize: "16px",
+        align: "center",
+        color: "black",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+    this.add
+      .text(50, 420, "earthquake", {
+        fontFamily: C.FONT_FAMILY,
+        fontSize: "16px",
+        align: "center",
+        color: "black",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
     const timedEvent = this.time.addEvent({
       delay: 1000,
       callback: this.onClockTick,
       callbackScope: this,
       loop: true,
     });
+    this.updateClock();
+
+    this.level = 0;
+    this.levelDisplay = this.add
+      .text(590, 380, "", {
+        fontFamily: C.FONT_FAMILY,
+        fontSize: "30px",
+        align: "center",
+        color: "black",
+      })
+      .setOrigin(0.5);
+    this.add
+      .text(590, 410, "earthquakes", {
+        fontFamily: C.FONT_FAMILY,
+        fontSize: "16px",
+        align: "center",
+        color: "black",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+    this.updateLevelDisplay();
 
     // Test functions for removing/adding rack tiles (hehe)
     this.input.keyboard.on(
@@ -101,6 +145,11 @@ export default class Game extends Phaser.Scene {
         C.EARTHQUAKE_DURATION * 1000,
         C.EARTHQUAKE_INTENSITY
       );
+      this.level++;
+      if (this.level >= C.NUMBER_OF_LEVELS) {
+        alert("WOW SUCH FINISH!!!11!");
+      }
+      this.updateLevelDisplay();
       for (let i = 0; i < this.columns.length; i++) {
         const column = this.columns[i];
         column.hideAddButton();
@@ -122,7 +171,15 @@ export default class Game extends Phaser.Scene {
       this.rack.fill(8);
       this.clockTime = C.TIME_PER_LEVEL + C.EARTHQUAKE_DURATION;
     }
+    this.updateClock();
+  }
+
+  updateClock() {
     this.clock.setText(this.clockTime.toString());
+  }
+
+  updateLevelDisplay() {
+    this.levelDisplay.setText(`${this.level} / ${C.NUMBER_OF_LEVELS}`);
   }
 
   addColumn(i: number) {
@@ -177,6 +234,9 @@ const config: Phaser.Types.Core.GameConfig = {
           window.innerWidth >= C.SCREEN_WIDTH * 1.5
         ? 1.5
         : 1,
+  },
+  render: {
+    pixelArt: true,
   },
 };
 

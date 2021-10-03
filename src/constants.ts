@@ -1,6 +1,8 @@
 export const TIME_PER_LEVEL = 20;
+export const NUMBER_OF_LEVELS = 20;
 export const EARTHQUAKE_DURATION = 1;
 export const EARTHQUAKE_INTENSITY = 0.01;
+export const FONT_FAMILY = "Neucha, sans-serif";
 export const SCREEN_WIDTH = 640;
 export const SCREEN_HEIGHT = 480;
 
