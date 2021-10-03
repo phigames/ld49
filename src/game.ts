@@ -100,6 +100,7 @@ export default class Game extends Phaser.Scene {
         const randomIndex = Math.floor(Math.random() * column.tiles.length);
         if (column.isWord) {
           column.removeTile(randomIndex, true);
+          column.unlock();
         } else {
           // TODO Animation for Earthquake Tiles
           for (const tile of column.tiles) {

@@ -149,6 +149,11 @@ export default class Column extends Phaser.GameObjects.Container {
     this.addButton.setVisible(false);
   }
 
+  unlock() {
+    this.isLocked = false;
+    this.updateLockButton();
+  }
+
   updateLockButton() {
     if (this.isWord) {
       this.lockButton.setVisible(true);
