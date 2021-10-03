@@ -10,10 +10,12 @@ export default class Game extends Phaser.Scene {
   columns: Column[];
   clock: Phaser.GameObjects.Text;
   clockTime: number;
+  clockState: "none" | "running" | "delay";
   levelDisplay: Phaser.GameObjects.Text;
   level: number;
   dictionary: Dictionary;
-  clockState: "none" | "running" | "delay";
+  score: number;
+  scoreText: Phaser.GameObjects.Text;
 
   constructor() {
     super("game");
@@ -53,6 +55,8 @@ export default class Game extends Phaser.Scene {
     });
     this.rack.fill(8);
     this.add.existing(this.rack);
+    this.score = 0;
+    this.scoreText = this.add.text(530, 400, this.score.toString());
 
     this.clockTime = C.TIME_PER_LEVEL;
     this.clock = this.add
@@ -207,7 +211,8 @@ export default class Game extends Phaser.Scene {
       () => this.addRackTileToColumn(i),
       //TODO provide fill function
       (numRackableTiles) => this.rack.fill(numRackableTiles),
-      (tile) => this.moveTileToRack(column, tile)
+      (tile) => this.moveTileToRack(column, tile),
+      (score) => this.updateScore(score)
     );
     this.columns.splice(i, 0, column);
     this.add.existing(column);
@@ -235,6 +240,11 @@ export default class Game extends Phaser.Scene {
       column.removeTile(tileIndex);
       this.rack.addTile(tile.letter);
     }
+  }
+
+  updateScore(score: number) {
+    this.score = this.score + score;
+    this.scoreText = this.scoreText.setText(this.score.toString());
   }
 }
 

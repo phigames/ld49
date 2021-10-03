@@ -1,5 +1,6 @@
 import { Dictionary } from "./dictionary";
 import Tile from "./tile";
+import * as C from "./constants";
 
 export default class Column extends Phaser.GameObjects.Container {
   background: Phaser.GameObjects.Image;
@@ -10,6 +11,7 @@ export default class Column extends Phaser.GameObjects.Container {
   lockButton: Phaser.GameObjects.Image;
   onAddButtonClick: Function;
   onLockButtonClick: Function;
+  onCountScore: Function;
   onTileClick: Function;
   isWord: boolean;
   isLocked: boolean;
@@ -21,7 +23,8 @@ export default class Column extends Phaser.GameObjects.Container {
     dictionary: Dictionary,
     onAddButtonClick,
     onLockButtonClick,
-    onTileClick
+    onTileClick,
+    onCountScore
   ) {
     super(scene, 70 + index * 100, 238);
     this.tiles = [];
@@ -33,9 +36,10 @@ export default class Column extends Phaser.GameObjects.Container {
       this.scene,
       1,
       -64,
-      "column-crumbly"
+      "column"
     );
     this.add(this.background);
+    this.makeColShadowy();
 
     this.lockButton = new Phaser.GameObjects.Image(
       this.scene,
@@ -70,9 +74,11 @@ export default class Column extends Phaser.GameObjects.Container {
 
     this.add(this.lockButton);
     this.onLockButtonClick = onLockButtonClick;
+    this.onCountScore = onCountScore;
     this.lockButton.on("pointerup", () => {
       this.onLockButtonClick(this.countNewTiles());
       this.lock();
+      this.onCountScore(this.score());
     });
   }
 
@@ -231,9 +237,9 @@ export default class Column extends Phaser.GameObjects.Container {
   checkCorrectWord() {
     this.isWord = this.dictionary.wordInDict(this.getWordString());
     if (this.isWord) {
-      this.background.setTexture("column");
+      this.makeColStable();
     } else {
-      this.background.setTexture("column-crumbly");
+      this.makeColUnstable();
     }
     this.updateLockButton();
   }
@@ -244,8 +250,32 @@ export default class Column extends Phaser.GameObjects.Container {
       if (!tile.rackable) {
         tile.setTint(0xe0e0e0);
       } else {
-        tile.setTint(0xffffff);
+        tile.clearTint();
       }
     }
+  }
+
+  makeColShadowy() {
+    this.background.setTint(0x696969);
+    this.background.setAlpha(0.5);
+  }
+
+  makeColStable() {
+    this.background.setTexture("column");
+    this.background.clearAlpha();
+    this.background.clearTint();
+  }
+
+  makeColUnstable() {
+    this.background.setTexture("column-crumbly");
+    this.background.clearAlpha();
+    this.background.clearTint();
+  }
+  score(): number {
+    let score = 0;
+    for (let tile of this.tiles) {
+      score = score + C.LETTER_SCORES[tile.letter];
+    }
+    return score;
   }
 }

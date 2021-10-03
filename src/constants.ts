@@ -7,6 +7,34 @@ export const FONT_FAMILY = "Neucha, sans-serif";
 export const SCREEN_WIDTH = 640;
 export const SCREEN_HEIGHT = 480;
 
+export const LETTER_SCORES: { [letter: string]: number } = {};
+LETTER_SCORES["A"] = 1;
+LETTER_SCORES["B"] = 3;
+LETTER_SCORES["C"] = 3;
+LETTER_SCORES["D"] = 2;
+LETTER_SCORES["E"] = 1;
+LETTER_SCORES["F"] = 4;
+LETTER_SCORES["G"] = 2;
+LETTER_SCORES["H"] = 4;
+LETTER_SCORES["I"] = 1;
+LETTER_SCORES["J"] = 8;
+LETTER_SCORES["K"] = 5;
+LETTER_SCORES["L"] = 1;
+LETTER_SCORES["M"] = 3;
+LETTER_SCORES["N"] = 1;
+LETTER_SCORES["O"] = 1;
+LETTER_SCORES["P"] = 3;
+LETTER_SCORES["Q"] = 10;
+LETTER_SCORES["R"] = 1;
+LETTER_SCORES["S"] = 1;
+LETTER_SCORES["T"] = 1;
+LETTER_SCORES["U"] = 1;
+LETTER_SCORES["V"] = 4;
+LETTER_SCORES["W"] = 4;
+LETTER_SCORES["X"] = 8;
+LETTER_SCORES["Y"] = 4;
+LETTER_SCORES["Z"] = 10;
+
 export const LETTERS: string[] = [
   "A",
   "A",
@@ -103,5 +131,7 @@ export const LETTERS: string[] = [
   "W",
   "W",
   "X",
+  "Y",
+  "Y",
   "Z",
 ];
