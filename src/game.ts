@@ -54,7 +54,7 @@ export default class Game extends Phaser.Scene {
     this.clock = this.add.text(600, 32, this.clockTime.toString());
     const timedEvent = this.time.addEvent({
       delay: 1000,
-      callback: this.onEvent,
+      callback: this.onClockTick,
       callbackScope: this,
       loop: true,
     });
@@ -83,18 +83,16 @@ export default class Game extends Phaser.Scene {
     );
   }
 
-  onEvent() {
+  onClockTick() {
     this.clockTime -= 1; // One second
     if (this.clockTime <= 0) {
       for (let i = 0; i < this.columns.length; i++) {
         const column = this.columns[i];
         column.hideAddButton();
         this.rack.resetActiveTile();
-        const randomIndex = Math.floor(
-          Math.random() * (column.tiles.length + 1)
-        );
+        const randomIndex = Math.floor(Math.random() * column.tiles.length);
         if (column.isWord) {
-          column.removeTile(randomIndex);
+          column.removeTile(randomIndex, true);
         } else {
           // TODO Animation for Earthquake Tiles
           for (const tile of column.tiles) {

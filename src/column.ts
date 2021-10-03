@@ -10,6 +10,7 @@ export default class Column extends Phaser.GameObjects.Container {
   lockButton: Phaser.GameObjects.Image;
   onAddButtonClick: Function;
   isWord: boolean;
+  isLocked: boolean;
 
   constructor(
     scene: Phaser.Scene,
@@ -39,15 +40,22 @@ export default class Column extends Phaser.GameObjects.Container {
       "letter-C"
     );
     this.add(this.lockButton);
-    this.lockButton.setInteractive({ useHandCursor: true });
-    this.lockButton.on("pointerup", () => {});
+    this.lockButton.on("pointerup", () => {
+      this.isLocked = true;
+      this.updateLockButton();
+    });
 
     letters.forEach((l, i) => {
       let tile = new Tile(scene, l, 0, 0);
       this.addTile(tile);
     });
 
-    this.addButton = new Phaser.GameObjects.Image(this.scene, 0, 100, "letter-X");
+    this.addButton = new Phaser.GameObjects.Image(
+      this.scene,
+      0,
+      100,
+      "letter-X"
+    );
     this.add(this.addButton);
     this.addButton.setInteractive({ useHandCursor: true });
     this.hideAddButton();
@@ -94,8 +102,12 @@ export default class Column extends Phaser.GameObjects.Container {
     });
   }
 
-  removeTile(index: number) {
-    this.remove(this.tiles[index]);
+  removeTile(index: number, destroy: boolean = false) {
+    if (destroy) {
+      this.tiles[index].destroy();
+    } else {
+      this.remove(this.tiles[index]);
+    }
     this.tiles.splice(index, 1);
     this.updateTileCoords();
     this.checkCorrectWord();
@@ -140,6 +152,13 @@ export default class Column extends Phaser.GameObjects.Container {
   updateLockButton() {
     if (this.isWord) {
       this.lockButton.setVisible(true);
+      if (this.isLocked) {
+        this.lockButton.setTexture("letter-O");
+        this.scene.input.disable(this.lockButton);
+      } else {
+        this.lockButton.setTexture("letter-C");
+        this.lockButton.setInteractive({ cursor: "pointer" });
+      }
     } else {
       this.lockButton.setVisible(false);
     }
