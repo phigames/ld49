@@ -178,7 +178,11 @@ export default class Game extends Phaser.Scene {
 
   update() {
     if (this.clockState === "none") {
-      if (this.columns.some((column) => column.isLocked === true)) {
+      if (
+        this.columns.some(
+          (column) => column.isLocked === true && column.tiles.length > 0
+        )
+      ) {
         this.clockState = "running";
         this.tutorial.destroy();
       }
