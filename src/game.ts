@@ -95,7 +95,6 @@ export default class Game extends Phaser.Scene {
 
     // clock
     if (this.level == 1) {
-      console.log("clock should stark");
       this.clockTime = C.TIME_PER_LEVEL;
       this.clock = this.add.text(600, 32, this.clockTime.toString());
       const timedEvent = this.time.addEvent({
@@ -110,7 +109,7 @@ export default class Game extends Phaser.Scene {
 
   onClockTick() {
     this.clockTime -= 1; // One second
-    if (this.clockTime <= 0) {
+    if (this.clockTime == 0) {
       this.cameras.main.shake(
         C.EARTHQUAKE_DURATION * 1000,
         C.EARTHQUAKE_INTENSITY
@@ -134,9 +133,12 @@ export default class Game extends Phaser.Scene {
         }
       }
       this.rack.fill(8);
+    } else if (this.clockTime == -C.PAUSE_AFTER_EARTHQUAKE) {
       this.clockTime = C.TIME_PER_LEVEL + C.EARTHQUAKE_DURATION;
     }
-    this.clock.setText(this.clockTime.toString());
+    if (this.clockTime >= 0) {
+      this.clock.setText(this.clockTime.toString());
+    }
   }
 
   addColumn(i: number) {
