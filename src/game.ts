@@ -157,7 +157,10 @@ export default class Game extends Phaser.Scene {
   }
 
   addRackTileToColumn(i: number) {
-    if (this.rack.activeTileIndex !== null) {
+    if (
+      this.rack.activeTileIndex !== null &&
+      this.columns[i].tiles.length < 8
+    ) {
       // index of currently selected tile
       const index = this.rack.activeTileIndex;
       // letter of currently selected tile
