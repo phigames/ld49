@@ -10,6 +10,7 @@ export default class Column extends Phaser.GameObjects.Container {
   lockButton: Phaser.GameObjects.Image;
   onAddButtonClick: Function;
   onLockButtonClick: Function;
+  onTileClick: Function;
   isWord: boolean;
   isLocked: boolean;
 
@@ -19,7 +20,8 @@ export default class Column extends Phaser.GameObjects.Container {
     letters: string[],
     dictionary: Dictionary,
     onAddButtonClick,
-    onLockButtonClick
+    onLockButtonClick,
+    onTileClick
   ) {
     super(scene, 70 + index * 100, 239);
     this.tiles = [];
@@ -57,13 +59,14 @@ export default class Column extends Phaser.GameObjects.Container {
     this.addButton.setInteractive({ useHandCursor: true });
     this.hideAddButton();
     this.onAddButtonClick = onAddButtonClick;
+    this.onTileClick = onTileClick;
     this.addButton.on("pointerup", this.onAddButtonClick);
 
     this.add(this.lockButton);
     this.onLockButtonClick = onLockButtonClick;
     this.lockButton.on("pointerup", () => {
-      this.lock();
       this.onLockButtonClick(this.countNewTiles());
+      this.lock();
     });
   }
 
@@ -74,7 +77,13 @@ export default class Column extends Phaser.GameObjects.Container {
     this.add(tile);
     this.updateTileCoords();
     this.checkCorrectWord();
-
+    tile.on(
+      "pointerup",
+      () => {
+        this.onTileClick(tile);
+      },
+      this
+    );
     this.scene.input.setDraggable(tile);
     tile.on("dragstart", () => {
       if (!this.isLocked) {
@@ -161,11 +170,16 @@ export default class Column extends Phaser.GameObjects.Container {
   unlock() {
     this.isLocked = false;
     this.updateLockButton();
+    for (const tile of this.tiles) {
+      tile.unlock();
+    }
   }
 
   lock() {
     this.isLocked = true;
     this.updateLockButton();
+    this.lockTiles();
+    this.tintLockedTiles();
   }
 
   updateLockButton() {
@@ -174,12 +188,24 @@ export default class Column extends Phaser.GameObjects.Container {
       if (this.isLocked) {
         this.lockButton.setTexture("letter-O");
         this.scene.input.disable(this.lockButton);
+        for (const tile of this.tiles) {
+          tile.lock();
+        }
       } else {
         this.lockButton.setTexture("letter-C");
         this.lockButton.setInteractive({ cursor: "pointer" });
+        for (const tile of this.tiles) {
+          tile.unlock();
+        }
       }
     } else {
       this.lockButton.setVisible(false);
+    }
+  }
+
+  lockTiles() {
+    for (const tile of this.tiles) {
+      tile.rackable = false;
     }
   }
 
@@ -187,10 +213,10 @@ export default class Column extends Phaser.GameObjects.Container {
     let i = 0;
     for (const tile of this.tiles) {
       if (tile.rackable) {
-        tile.rackable = false;
         i++;
       }
     }
+    this.lockTiles();
     console.log(i);
     return i;
   }
@@ -211,5 +237,16 @@ export default class Column extends Phaser.GameObjects.Container {
       this.background.setTexture("column-crumbly");
     }
     this.updateLockButton();
+  }
+
+  tintLockedTiles() {
+    for (let i = 0; i < this.tiles.length; i++) {
+      const tile = this.tiles[i];
+      if (!tile.rackable) {
+        tile.setTint(0x888888);
+      } else {
+        tile.setTint(0xffffff);
+      }
+    }
   }
 }
