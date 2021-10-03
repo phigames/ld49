@@ -40,9 +40,11 @@ export default class Rack extends Phaser.GameObjects.Container {
           // this.tintActiveTile();
           this.updateColumnButtons();
 
+          // If highlight, remove it
           if (this.highlightRect2) {
             this.highlightRect2.destroy();
           }
+          // Add highlight when clicked
           this.highlightRect2 = new Phaser.GameObjects.Graphics(this.scene);
           this.highlightRect2.fillStyle(0xffffff, 0.3);
           this.highlightRect2.fillRoundedRect(
@@ -67,6 +69,7 @@ export default class Rack extends Phaser.GameObjects.Container {
     this.updateTileCoords();
     this.resetActiveTile();
     this.updateColumnButtons();
+    // Remove highlight
     if (this.highlightRect2) {
       this.highlightRect2.destroy();
     }
@@ -74,19 +77,7 @@ export default class Rack extends Phaser.GameObjects.Container {
 
   resetActiveTile() {
     this.activeTileIndex = null;
-    // this.tintActiveTile();
   }
-
-  // tintActiveTile() {
-  //   for (let i = 0; i < this.tiles.length; i++) {
-  //     const tile = this.tiles[i];
-  //     if (i === this.activeTileIndex) {
-  //       tile.setTint(0x888888);
-  //     } else {
-  //       tile.setTint(0xffffff);
-  //     }
-  //   }
-  // }
 
   fill(tilesToFill: integer) {
     // Fill rack with random letter tiles, ensuring at least one vowel
