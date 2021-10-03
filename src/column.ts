@@ -72,27 +72,31 @@ export default class Column extends Phaser.GameObjects.Container {
 
     this.scene.input.setDraggable(tile);
     tile.on("dragstart", () => {
-      this.draggingTile = tile;
+      if (!this.isLocked) {
+        this.draggingTile = tile;
+      }
     });
     tile.on("drag", (_, dragX: number, dragY: number) => {
-      tile.y = dragY;
-      const index = this.tiles.indexOf(tile);
-      for (let i = 0; i < this.tiles.length; i++) {
-        if (i < index && tile.y < this.tiles[i].y + 16) {
-          // Move tile up
-          this.tiles.splice(index, 1);
-          this.tiles.splice(i, 0, tile);
-          this.updateTileCoords(true, tile);
-          this.checkCorrectWord();
-          break;
-        }
-        if (i > index && tile.y > this.tiles[i].y - 16) {
-          // Move tile down
-          this.tiles.splice(index, 1);
-          this.tiles.splice(i, 0, tile);
-          this.updateTileCoords(true, tile);
-          this.checkCorrectWord();
-          break;
+      if (tile === this.draggingTile) {
+        tile.y = dragY;
+        const index = this.tiles.indexOf(tile);
+        for (let i = 0; i < this.tiles.length; i++) {
+          if (i < index && tile.y < this.tiles[i].y + 16) {
+            // Move tile up
+            this.tiles.splice(index, 1);
+            this.tiles.splice(i, 0, tile);
+            this.updateTileCoords(true, tile);
+            this.checkCorrectWord();
+            break;
+          }
+          if (i > index && tile.y > this.tiles[i].y - 16) {
+            // Move tile down
+            this.tiles.splice(index, 1);
+            this.tiles.splice(i, 0, tile);
+            this.updateTileCoords(true, tile);
+            this.checkCorrectWord();
+            break;
+          }
         }
       }
     });
