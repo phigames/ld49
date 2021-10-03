@@ -1,5 +1,5 @@
 export const TIME_PER_LEVEL = 20;
-export const NUMBER_OF_LEVELS = 20;
+export const NUMBER_OF_LEVELS = 10;
 export const EARTHQUAKE_DURATION = 1;
 export const EARTHQUAKE_INTENSITY = 0.01;
 export const PAUSE_AFTER_EARTHQUAKE = 3;
