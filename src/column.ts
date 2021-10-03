@@ -6,9 +6,9 @@ export default class Column extends Phaser.GameObjects.Container {
   tiles: Tile[];
   draggingTile: Tile | null;
   dictionary: Dictionary;
-  button: Phaser.GameObjects.Image;
+  addButton: Phaser.GameObjects.Image;
   lockButton: Phaser.GameObjects.Image;
-  buttonAddsTile: Function;
+  onAddButtonClick: Function;
   isWord: boolean;
 
   constructor(
@@ -16,7 +16,7 @@ export default class Column extends Phaser.GameObjects.Container {
     index: number,
     letters: string[],
     dictionary: Dictionary,
-    buttonAddsTile
+    onAddButtonClick
   ) {
     super(scene, 70 + index * 100, 239);
     this.tiles = [];
@@ -47,12 +47,12 @@ export default class Column extends Phaser.GameObjects.Container {
       this.addTile(tile);
     });
 
-    this.button = new Phaser.GameObjects.Image(this.scene, 0, 100, "letter-X");
-    this.add(this.button);
-    this.button.setInteractive({ useHandCursor: true });
-    this.hideButton();
-    this.buttonAddsTile = buttonAddsTile;
-    this.button.on("pointerup", this.buttonAddsTile);
+    this.addButton = new Phaser.GameObjects.Image(this.scene, 0, 100, "letter-X");
+    this.add(this.addButton);
+    this.addButton.setInteractive({ useHandCursor: true });
+    this.hideAddButton();
+    this.onAddButtonClick = onAddButtonClick;
+    this.addButton.on("pointerup", this.onAddButtonClick);
   }
 
   addTile(tile: Tile) {
@@ -129,12 +129,12 @@ export default class Column extends Phaser.GameObjects.Container {
     }
   }
 
-  showButton() {
-    this.button.setVisible(true);
+  showAddButton() {
+    this.addButton.setVisible(true);
   }
 
-  hideButton() {
-    this.button.setVisible(false);
+  hideAddButton() {
+    this.addButton.setVisible(false);
   }
 
   updateLockButton() {

@@ -38,10 +38,10 @@ export default class Game extends Phaser.Scene {
 
     this.rack = new Rack(this, () => {
       for (const column of this.columns) {
-        if (this.rack.activeLetter !== null) {
-          column.showButton();
+        if (this.rack.activeTileIndex !== null) {
+          column.showAddButton();
         } else {
-          column.hideButton();
+          column.hideAddButton();
         }
       }
     });
@@ -88,7 +88,7 @@ export default class Game extends Phaser.Scene {
     if (this.clockTime <= 0) {
       for (let i = 0; i < this.columns.length; i++) {
         const column = this.columns[i];
-        column.hideButton();
+        column.hideAddButton();
         this.rack.resetActiveTile();
         const randomIndex = Math.floor(
           Math.random() * (column.tiles.length + 1)
@@ -112,16 +112,16 @@ export default class Game extends Phaser.Scene {
 
   addColumn(i: number) {
     const column = new Column(this, i, ["A", "B", "C"], this.dictionary, () =>
-      this.addRackTile(i)
+      this.addRackTileToColumn(i)
     );
     this.columns.splice(i, 0, column);
     this.add.existing(column);
   }
 
-  addRackTile(i: number) {
-    if (this.rack.activeLetter !== null) {
+  addRackTileToColumn(i: number) {
+    if (this.rack.activeTileIndex !== null) {
       // index of currently selected tile
-      const index = this.rack.activeLetter;
+      const index = this.rack.activeTileIndex;
       // letter of currently selected tile
       const letter = this.rack.tiles[index].letter;
       let tile = new Tile(this, letter, 0, 0);

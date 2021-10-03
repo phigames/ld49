@@ -3,8 +3,7 @@ import * as C from "./constants";
 
 export default class Rack extends Phaser.GameObjects.Container {
   tiles: Tile[];
-  letters: string[];
-  activeLetter: number | null;
+  activeTileIndex: number | null;
   updateColumnButtons: Function;
 
   constructor(scene: Phaser.Scene, updateColumnButtons: Function) {
@@ -36,7 +35,7 @@ export default class Rack extends Phaser.GameObjects.Container {
       newTile.on(
         "pointerup",
         () => {
-          this.activeLetter = this.tiles.indexOf(newTile);
+          this.activeTileIndex = this.tiles.indexOf(newTile);
           this.tintActiveTile();
           this.updateColumnButtons();
         },
@@ -57,14 +56,14 @@ export default class Rack extends Phaser.GameObjects.Container {
   }
 
   resetActiveTile() {
-    this.activeLetter = null;
+    this.activeTileIndex = null;
     this.tintActiveTile();
   }
 
   tintActiveTile() {
     for (let i = 0; i < this.tiles.length; i++) {
       const tile = this.tiles[i];
-      if (i === this.activeLetter) {
+      if (i === this.activeTileIndex) {
         tile.setTint(0x888888);
       } else {
         tile.setTint(0xffffff);
