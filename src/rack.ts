@@ -37,6 +37,7 @@ export default class Rack extends Phaser.GameObjects.Container {
         "pointerup",
         () => {
           this.activeLetter = this.tiles.indexOf(newTile);
+          this.tintActiveTile();
           this.updateColumnButtons();
         },
         this
@@ -51,9 +52,20 @@ export default class Rack extends Phaser.GameObjects.Container {
     this.tiles[i].destroy();
     this.tiles.splice(i, 1);
     this.updateTileCoords();
-    console.log("tile removed");
     this.activeLetter = null;
+    this.tintActiveTile();
     this.updateColumnButtons();
+  }
+
+  tintActiveTile() {
+    for (let i = 0; i < this.tiles.length; i++) {
+      const tile = this.tiles[i];
+      if (i === this.activeLetter) {
+        tile.setTint(0x888888);
+      } else {
+        tile.setTint(0xffffff);
+      }
+    }
   }
 
   fill() {
