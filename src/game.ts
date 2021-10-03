@@ -4,6 +4,7 @@ import * as C from "./constants";
 import { Dictionary } from "./dictionary";
 import Rack from "./rack";
 import Tile from "./tile";
+import Endscreen from "./endscreen";
 
 export default class Game extends Phaser.Scene {
   rack: Rack;
@@ -143,6 +144,19 @@ export default class Game extends Phaser.Scene {
       },
       this
     );
+
+    this.input.keyboard.on(
+      "keydown-X",
+      function () {
+        console.log("endscreen started");
+        this.scene.start("endscreen", {
+          score: this.score,
+        });
+      },
+      this
+    );
+
+    //
   }
 
   update() {
@@ -193,6 +207,19 @@ export default class Game extends Phaser.Scene {
           this.columns.splice(i, 1);
           this.addColumn(i);
           column.destroy(true);
+        }
+        // Endscreen Condition
+        if (!this.columns.some((column) => column.tiles.length > 0)) {
+          console.log("no pillars left");
+          this.time.addEvent({
+            delay: 2000,
+            loop: false,
+            callback: () => {
+              this.scene.start("endscreen", {
+                score: this.score,
+              });
+            },
+          });
         }
       }
       this.rack.fill(8);
@@ -263,7 +290,7 @@ const config: Phaser.Types.Core.GameConfig = {
   backgroundColor: "#125555",
   width: C.SCREEN_WIDTH,
   height: C.SCREEN_HEIGHT,
-  scene: Game,
+  scene: [Game, Endscreen],
   scale: {
     zoom:
       window.innerHeight >= C.SCREEN_HEIGHT * 2 &&

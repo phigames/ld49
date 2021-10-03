@@ -271,6 +271,7 @@ export default class Column extends Phaser.GameObjects.Container {
     this.background.clearAlpha();
     this.background.clearTint();
   }
+
   score(): number {
     let score = 0;
     for (let tile of this.tiles) {
