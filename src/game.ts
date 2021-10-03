@@ -117,8 +117,14 @@ export default class Game extends Phaser.Scene {
   }
 
   addColumn(i: number) {
-    const column = new Column(this, i, ["A", "B", "C"], this.dictionary, () =>
-      this.addRackTileToColumn(i)
+    const column = new Column(
+      this,
+      i,
+      ["A", "B", "C"],
+      this.dictionary,
+      () => this.addRackTileToColumn(i),
+      //TODO provide fill function
+      () => {}
     );
     this.columns.splice(i, 0, column);
     this.add.existing(column);

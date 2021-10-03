@@ -9,6 +9,7 @@ export default class Column extends Phaser.GameObjects.Container {
   addButton: Phaser.GameObjects.Image;
   lockButton: Phaser.GameObjects.Image;
   onAddButtonClick: Function;
+  onLockButtonClick: Function;
   isWord: boolean;
   isLocked: boolean;
 
@@ -17,7 +18,8 @@ export default class Column extends Phaser.GameObjects.Container {
     index: number,
     letters: string[],
     dictionary: Dictionary,
-    onAddButtonClick
+    onAddButtonClick,
+    onLockButtonClick
   ) {
     super(scene, 70 + index * 100, 239);
     this.tiles = [];
@@ -39,11 +41,6 @@ export default class Column extends Phaser.GameObjects.Container {
       70,
       "letter-C"
     );
-    this.add(this.lockButton);
-    this.lockButton.on("pointerup", () => {
-      this.isLocked = true;
-      this.updateLockButton();
-    });
 
     letters.forEach((l, i) => {
       let tile = new Tile(scene, l, 0, 0);
@@ -61,6 +58,13 @@ export default class Column extends Phaser.GameObjects.Container {
     this.hideAddButton();
     this.onAddButtonClick = onAddButtonClick;
     this.addButton.on("pointerup", this.onAddButtonClick);
+
+    this.add(this.lockButton);
+    this.onLockButtonClick = onLockButtonClick;
+    this.lockButton.on("pointerup", () => {
+      this.lock();
+      this.onLockButtonClick(this.countNewTiles());
+    });
   }
 
   addTile(tile: Tile) {
@@ -158,6 +162,11 @@ export default class Column extends Phaser.GameObjects.Container {
     this.updateLockButton();
   }
 
+  lock() {
+    this.isLocked = true;
+    this.updateLockButton();
+  }
+
   updateLockButton() {
     if (this.isWord) {
       this.lockButton.setVisible(true);
@@ -171,6 +180,18 @@ export default class Column extends Phaser.GameObjects.Container {
     } else {
       this.lockButton.setVisible(false);
     }
+  }
+
+  countNewTiles() {
+    let i = 0;
+    for (const tile of this.tiles) {
+      if (tile.rackable) {
+        tile.rackable = false;
+        i++;
+      }
+    }
+    console.log(i);
+    return i;
   }
 
   getWordString() {
