@@ -4,7 +4,7 @@ import Tile from "./tile";
 export default class Column extends Phaser.GameObjects.Container {
   background: Phaser.GameObjects.Image;
   tiles: Tile[];
-  draggingTile: Tile | null;
+  dragging: boolean;
   dictionary: Dictionary;
   addButton: Phaser.GameObjects.Image;
   lockButton: Phaser.GameObjects.Image;
@@ -25,7 +25,7 @@ export default class Column extends Phaser.GameObjects.Container {
   ) {
     super(scene, 70 + index * 100, 239);
     this.tiles = [];
-    this.draggingTile = null;
+    this.dragging = false;
     this.isWord = false;
     this.dictionary = dictionary;
 
@@ -43,6 +43,11 @@ export default class Column extends Phaser.GameObjects.Container {
       70,
       "letter-C"
     );
+    this.add(this.lockButton);
+    this.lockButton.on("pointerup", () => {
+      this.isLocked = true;
+      this.updateLockButton();
+    });
 
     letters.forEach((l, i) => {
       let tile = new Tile(scene, l, 0, 0);
@@ -81,18 +86,17 @@ export default class Column extends Phaser.GameObjects.Container {
     tile.on(
       "pointerup",
       () => {
-        this.onTileClick(tile);
+        if (!this.dragging) {
+          this.onTileClick(tile);
+        }
+        this.dragging = false;
       },
       this
     );
     this.scene.input.setDraggable(tile);
-    tile.on("dragstart", () => {
-      if (!this.isLocked) {
-        this.draggingTile = tile;
-      }
-    });
     tile.on("drag", (_, dragX: number, dragY: number) => {
-      if (tile === this.draggingTile) {
+      if (!this.isLocked) {
+        this.dragging = true;
         tile.y = dragY;
         const index = this.tiles.indexOf(tile);
         for (let i = 0; i < this.tiles.length; i++) {
@@ -116,7 +120,6 @@ export default class Column extends Phaser.GameObjects.Container {
       }
     });
     tile.on("dragend", () => {
-      this.draggingTile = null;
       this.updateTileCoords();
     });
   }
@@ -143,7 +146,7 @@ export default class Column extends Phaser.GameObjects.Container {
                 props: { y: nextTileY },
                 duration: 100,
                 onComplete() {
-                  if (that.draggingTile === null) that.updateTileCoords();
+                  if (!that.dragging) that.updateTileCoords();
                 },
               });
             }
@@ -214,7 +217,6 @@ export default class Column extends Phaser.GameObjects.Container {
       }
     }
     this.lockTiles();
-    console.log(i);
     return i;
   }
 

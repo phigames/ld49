@@ -18,7 +18,7 @@ export default class Game extends Phaser.Scene {
   }
 
   preload() {
-    for (const letter of C.LETTERS) {
+    for (const letter of Array.from(new Set(C.LETTERS))) {
       this.load.image(`letter-${letter}`, `assets/letter-${letter}.png`);
     }
     this.load.image("background", "assets/background.png");
@@ -44,7 +44,6 @@ export default class Game extends Phaser.Scene {
     }
 
     this.rack = new Rack(this, () => {
-      console.log(this.columns);
       for (const column of this.columns) {
         if (this.rack !== undefined && this.rack.activeTileIndex !== null) {
           column.showAddButton();
@@ -74,7 +73,7 @@ export default class Game extends Phaser.Scene {
     this.input.keyboard.on(
       "keydown-A",
       function () {
-        this.rack.fill();
+        this.rack.fill(8);
       },
       this
     );
