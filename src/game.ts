@@ -58,7 +58,7 @@ export default class Game extends Phaser.Scene {
     this.clock = this.add.text(600, 32, this.clockTime.toString());
     const timedEvent = this.time.addEvent({
       delay: 1000,
-      callback: this.onEvent,
+      callback: this.onClockTick,
       callbackScope: this,
       loop: true,
     });
@@ -94,18 +94,18 @@ export default class Game extends Phaser.Scene {
     );
   }
 
-  onEvent() {
+  onClockTick() {
     this.clockTime -= 1; // One second
     if (this.clockTime <= 0) {
+      this.cameras.main.shake(C.EARTHQUAKE_DURATION * 1000);
       for (let i = 0; i < this.columns.length; i++) {
         const column = this.columns[i];
         column.hideAddButton();
         this.rack.resetActiveTile();
-        const randomIndex = Math.floor(
-          Math.random() * (column.tiles.length + 1)
-        );
+        const randomIndex = Math.floor(Math.random() * column.tiles.length);
         if (column.isWord) {
-          column.removeTile(randomIndex);
+          column.removeTile(randomIndex, true);
+          column.unlock();
         } else {
           // TODO Animation for Earthquake Tiles
           for (const tile of column.tiles) {
@@ -116,14 +116,21 @@ export default class Game extends Phaser.Scene {
           column.destroy(true);
         }
       }
-      this.clockTime = C.TIME_PER_LEVEL;
+      this.clockTime = C.TIME_PER_LEVEL + C.EARTHQUAKE_DURATION;
     }
     this.clock.setText(this.clockTime.toString());
   }
 
   addColumn(i: number) {
-    const column = new Column(this, i, ["A", "B", "C"], this.dictionary, () =>
-      this.addRackTileToColumn(i)
+    const column = new Column(
+      this,
+      i,
+      [],
+      this.dictionary,
+      () => this.addRackTileToColumn(i),
+      //TODO provide fill function
+      () => {},
+      (tile) => this.moveTileToRack(column, tile)
     );
     this.columns.splice(i, 0, column);
     this.add.existing(column);
@@ -138,13 +145,14 @@ export default class Game extends Phaser.Scene {
       let tile = new Tile(this, letter, 0, 0);
       this.columns[i].addTile(tile);
       this.rack.removeTile(index);
+      this.columns[i].unlock();
     }
   }
 
-  moveTileToRack(column: Column, index: number) {
-    const tile = column.tiles[index];
-    if (tile.rackable) {
-      column.removeTile(index);
+  moveTileToRack(column: Column, tile: Tile) {
+    const tileIndex = column.tiles.indexOf(tile);
+    if (tile.rackable && this.rack.tiles.length < 8) {
+      column.removeTile(tileIndex);
       this.rack.addTile(tile.letter);
     }
   }

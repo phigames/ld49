@@ -9,14 +9,19 @@ export default class Column extends Phaser.GameObjects.Container {
   addButton: Phaser.GameObjects.Image;
   lockButton: Phaser.GameObjects.Image;
   onAddButtonClick: Function;
+  onLockButtonClick: Function;
+  onTileClick: Function;
   isWord: boolean;
+  isLocked: boolean;
 
   constructor(
     scene: Phaser.Scene,
     index: number,
     letters: string[],
     dictionary: Dictionary,
-    onAddButtonClick
+    onAddButtonClick,
+    onLockButtonClick,
+    onTileClick
   ) {
     super(scene, 70 + index * 100, 239);
     this.tiles = [];
@@ -38,53 +43,75 @@ export default class Column extends Phaser.GameObjects.Container {
       70,
       "letter-C"
     );
-    this.add(this.lockButton);
-    this.lockButton.setInteractive({ useHandCursor: true });
-    this.lockButton.on("pointerup", () => {});
 
     letters.forEach((l, i) => {
       let tile = new Tile(scene, l, 0, 0);
       this.addTile(tile);
     });
+    this.updateLockButton();
 
-    this.addButton = new Phaser.GameObjects.Image(this.scene, 0, 100, "letter-X");
+    this.addButton = new Phaser.GameObjects.Image(
+      this.scene,
+      0,
+      100,
+      "letter-X"
+    );
     this.add(this.addButton);
     this.addButton.setInteractive({ useHandCursor: true });
     this.hideAddButton();
     this.onAddButtonClick = onAddButtonClick;
+    this.onTileClick = onTileClick;
     this.addButton.on("pointerup", this.onAddButtonClick);
+
+    this.add(this.lockButton);
+    this.onLockButtonClick = onLockButtonClick;
+    this.lockButton.on("pointerup", () => {
+      this.onLockButtonClick(this.countNewTiles());
+      this.lock();
+    });
   }
 
   addTile(tile: Tile) {
     tile.removeAllListeners();
+    this.unlock();
     this.tiles.push(tile);
     this.add(tile);
     this.updateTileCoords();
     this.checkCorrectWord();
-
+    tile.on(
+      "pointerup",
+      () => {
+        this.onTileClick(tile);
+      },
+      this
+    );
     this.scene.input.setDraggable(tile);
     tile.on("dragstart", () => {
-      this.draggingTile = tile;
+      if (!this.isLocked) {
+        this.draggingTile = tile;
+      }
     });
     tile.on("drag", (_, dragX: number, dragY: number) => {
-      tile.y = dragY;
-      const index = this.tiles.indexOf(tile);
-      for (let i = 0; i < this.tiles.length; i++) {
-        if (i < index && tile.y < this.tiles[i].y + 16) {
-          // Move tile up
-          this.tiles.splice(index, 1);
-          this.tiles.splice(i, 0, tile);
-          this.updateTileCoords(true, tile);
-          this.checkCorrectWord();
-          break;
-        }
-        if (i > index && tile.y > this.tiles[i].y - 16) {
-          // Move tile down
-          this.tiles.splice(index, 1);
-          this.tiles.splice(i, 0, tile);
-          this.updateTileCoords(true, tile);
-          this.checkCorrectWord();
-          break;
+      if (tile === this.draggingTile) {
+        tile.y = dragY;
+        const index = this.tiles.indexOf(tile);
+        for (let i = 0; i < this.tiles.length; i++) {
+          if (i < index && tile.y < this.tiles[i].y + 16) {
+            // Move tile up
+            this.tiles.splice(index, 1);
+            this.tiles.splice(i, 0, tile);
+            this.updateTileCoords(true, tile);
+            this.checkCorrectWord();
+            break;
+          }
+          if (i > index && tile.y > this.tiles[i].y - 16) {
+            // Move tile down
+            this.tiles.splice(index, 1);
+            this.tiles.splice(i, 0, tile);
+            this.updateTileCoords(true, tile);
+            this.checkCorrectWord();
+            break;
+          }
         }
       }
     });
@@ -94,8 +121,12 @@ export default class Column extends Phaser.GameObjects.Container {
     });
   }
 
-  removeTile(index: number) {
-    this.remove(this.tiles[index]);
+  removeTile(index: number, destroy: boolean = false) {
+    if (destroy) {
+      this.tiles[index].destroy();
+    } else {
+      this.remove(this.tiles[index]);
+    }
     this.tiles.splice(index, 1);
     this.updateTileCoords();
     this.checkCorrectWord();
@@ -137,12 +168,58 @@ export default class Column extends Phaser.GameObjects.Container {
     this.addButton.setVisible(false);
   }
 
+  unlock() {
+    this.isLocked = false;
+    this.updateLockButton();
+    for (const tile of this.tiles) {
+      tile.unlock();
+    }
+  }
+
+  lock() {
+    this.isLocked = true;
+    this.updateLockButton();
+    this.lockTiles();
+    this.tintLockedTiles();
+  }
+
   updateLockButton() {
     if (this.isWord) {
       this.lockButton.setVisible(true);
+      if (this.isLocked) {
+        this.lockButton.setTexture("letter-O");
+        this.scene.input.disable(this.lockButton);
+        for (const tile of this.tiles) {
+          tile.lock();
+        }
+      } else {
+        this.lockButton.setTexture("letter-C");
+        this.lockButton.setInteractive({ cursor: "pointer" });
+        for (const tile of this.tiles) {
+          tile.unlock();
+        }
+      }
     } else {
       this.lockButton.setVisible(false);
     }
+  }
+
+  lockTiles() {
+    for (const tile of this.tiles) {
+      tile.rackable = false;
+    }
+  }
+
+  countNewTiles() {
+    let i = 0;
+    for (const tile of this.tiles) {
+      if (tile.rackable) {
+        i++;
+      }
+    }
+    this.lockTiles();
+    console.log(i);
+    return i;
   }
 
   getWordString() {
@@ -161,5 +238,16 @@ export default class Column extends Phaser.GameObjects.Container {
       this.background.setTexture("column-crumbly");
     }
     this.updateLockButton();
+  }
+
+  tintLockedTiles() {
+    for (let i = 0; i < this.tiles.length; i++) {
+      const tile = this.tiles[i];
+      if (!tile.rackable) {
+        tile.setTint(0xe0e0e0);
+      } else {
+        tile.setTint(0xffffff);
+      }
+    }
   }
 }
