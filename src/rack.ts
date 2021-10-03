@@ -47,9 +47,7 @@ export default class Rack extends Phaser.GameObjects.Container {
 
   removeTile(i: integer) {
     // Remove one element at index
-    // this.remove(this.tiles[i]);
     this.tiles[i].destroy();
-    console.log("tile destroyed.");
     this.tiles.splice(i, 1);
     this.updateTileCoords();
     this.resetActiveTile();
