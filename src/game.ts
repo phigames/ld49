@@ -36,6 +36,7 @@ export default class Game extends Phaser.Scene {
     this.load.image("arrow", "assets/arrow.png");
     this.load.image("ok1", "assets/ok1.png");
     this.load.image("ok2", "assets/ok2.png");
+    this.load.audio("music", "assets/music.ogg");
     this.load.json("wordList", "assets/words.json");
     this.load.html("nameform", "assets/nameform.html");
   }
@@ -185,6 +186,7 @@ export default class Game extends Phaser.Scene {
       ) {
         this.clockState = "running";
         this.tutorial.destroy();
+        this.sound.play("music");
       }
     }
 
@@ -242,6 +244,7 @@ export default class Game extends Phaser.Scene {
       this.updateLevelDisplay();
     } else if (this.clockTime <= -C.PAUSE_AFTER_EARTHQUAKE) {
       this.clockTime = C.TIME_PER_LEVEL;
+      this.sound.play("music");
     }
     this.updateClock();
   }
@@ -345,41 +348,48 @@ export default class Game extends Phaser.Scene {
       const username: string = usernameField["value"];
       if (username.trim() !== "") {
         usernameField["disabled"] = true;
-        postScore(username, this.score).then(() => {
-          nameform.destroy();
-          this.add
-            .text(
-              C.SCREEN_WIDTH / 2,
-              C.SCREEN_HEIGHT / 2 - 200,
-              "Leaderboard",
-              {
-                fontFamily: C.FONT_FAMILY,
-                fontSize: "30px",
-                fontStyle: "bold",
-                color: "black",
-                backgroundColor: "white",
-              }
-            )
-            .setOrigin(0.5, 0);
-          const leaderboard = this.add
-            .text(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2 - 150, "Loading...", {
-              fontFamily: C.FONT_FAMILY,
-              fontSize: "25px",
-              color: "black",
-              backgroundColor: "white",
-            })
-            .setOrigin(0.5, 0);
-          getLeaderboard().then(({ runs }) => {
-            const text = runs
-              .map((run) => `${run.username}: ${run.score}`)
-              .join("\n");
-            console.log(text);
-            leaderboard.setText(text);
+        postScore(username, this.score)
+          .then(() => {
+            nameform.destroy();
+            this.add
+              .text(
+                C.SCREEN_WIDTH / 2,
+                C.SCREEN_HEIGHT / 2 - 200,
+                "Leaderboard",
+                {
+                  fontFamily: C.FONT_FAMILY,
+                  fontSize: "30px",
+                  fontStyle: "bold",
+                  color: "black",
+                  backgroundColor: "white",
+                }
+              )
+              .setOrigin(0.5, 0);
+            const leaderboard = this.add
+              .text(
+                C.SCREEN_WIDTH / 2,
+                C.SCREEN_HEIGHT / 2 - 150,
+                "Loading...",
+                {
+                  fontFamily: C.FONT_FAMILY,
+                  fontSize: "25px",
+                  color: "black",
+                  backgroundColor: "white",
+                }
+              )
+              .setOrigin(0.5, 0);
+            getLeaderboard().then(({ runs }) => {
+              const text = runs
+                .map((run) => `${run.username}: ${run.score}`)
+                .join("\n");
+              console.log(text);
+              leaderboard.setText(text);
+            });
+          })
+          .catch(() => {
+            usernameField["disabled"] = false;
+            usernameField["value"] = "ERROR (please try again)";
           });
-        }).catch(() => {
-          usernameField["disabled"] = false;
-          usernameField["value"] = "ERROR (please try again)";
-        });
       }
     });
 
