@@ -52,9 +52,13 @@ export default class Rack extends Phaser.GameObjects.Container {
     this.tiles[i].destroy();
     this.tiles.splice(i, 1);
     this.updateTileCoords();
+    this.resetActiveTile();
+    this.updateColumnButtons();
+  }
+
+  resetActiveTile() {
     this.activeLetter = null;
     this.tintActiveTile();
-    this.updateColumnButtons();
   }
 
   tintActiveTile() {

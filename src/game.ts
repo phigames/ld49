@@ -88,6 +88,8 @@ export default class Game extends Phaser.Scene {
     if (this.clockTime <= 0) {
       for (let i = 0; i < this.columns.length; i++) {
         const column = this.columns[i];
+        column.hideButton();
+        this.rack.resetActiveTile();
         const randomIndex = Math.floor(
           Math.random() * (column.tiles.length + 1)
         );
