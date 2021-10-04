@@ -36,6 +36,8 @@ export default class Game extends Phaser.Scene {
     this.load.image("arrow", "assets/arrow.png");
     this.load.image("ok1", "assets/ok1.png");
     this.load.image("ok2", "assets/ok2.png");
+    this.load.image("tutorial-box", "assets/tutorial-box.png");
+    this.load.image("leaderboard-box", "assets/leaderboard-box.png");
     this.load.audio("music", "assets/music.ogg");
     this.load.json("wordList", "assets/words.json");
     this.load.html("nameform", "assets/nameform.html");
@@ -339,15 +341,22 @@ export default class Game extends Phaser.Scene {
       .createFromCache("nameform");
     nameform.setAlpha(0);
     const usernameField = nameform.getChildByName("username");
+    const submitButton = nameform.getChildByName("submit");
     const form = nameform.getChildByID("nameform");
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       const username: string = usernameField["value"];
       if (username.trim() !== "") {
         usernameField["disabled"] = true;
+        submitButton["disabled"] = true;
         postScore(username, this.score)
           .then(() => {
             nameform.destroy();
+            this.add.image(
+              C.SCREEN_WIDTH / 2,
+              C.SCREEN_HEIGHT / 2 - 50,
+              "leaderboard-box"
+            );
             this.add
               .text(
                 C.SCREEN_WIDTH / 2,
@@ -358,7 +367,6 @@ export default class Game extends Phaser.Scene {
                   fontSize: "30px",
                   fontStyle: "bold",
                   color: "black",
-                  backgroundColor: "white",
                 }
               )
               .setOrigin(0.5, 0);
@@ -369,9 +377,8 @@ export default class Game extends Phaser.Scene {
                 "Loading...",
                 {
                   fontFamily: C.FONT_FAMILY,
-                  fontSize: "25px",
+                  fontSize: "20px",
                   color: "black",
-                  backgroundColor: "white",
                 }
               )
               .setOrigin(0.5, 0);
@@ -386,6 +393,7 @@ export default class Game extends Phaser.Scene {
           .catch(() => {
             usernameField["disabled"] = false;
             usernameField["value"] = "ERROR (please try again)";
+            submitButton["disabled"] = false;
           });
       }
     });
