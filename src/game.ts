@@ -38,6 +38,7 @@ export default class Game extends Phaser.Scene {
     this.load.image("ok2", "assets/ok2.png");
     this.load.image("tutorial-box", "assets/tutorial-box.png");
     this.load.image("leaderboard-box", "assets/leaderboard-box.png");
+    this.load.image("gameover", "assets/gameover.png");
     this.load.audio("music", "assets/music.ogg");
     this.load.json("wordList", "assets/words.json");
     this.load.html("nameform", "assets/nameform.html");
