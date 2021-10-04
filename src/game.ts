@@ -2,7 +2,7 @@ import "phaser";
 import Column from "./column";
 import * as C from "./constants";
 import { Dictionary } from "./dictionary";
-import { getLeaderboard, postScore } from "./leaderboard";
+import { postScore } from "./leaderboard";
 import Rack from "./rack";
 import TextBox from "./textbox";
 import Tile from "./tile";
@@ -349,9 +349,10 @@ export default class Game extends Phaser.Scene {
       const username: string = usernameField["value"];
       if (username.trim() !== "") {
         usernameField["disabled"] = true;
+        submitButton["value"] = "Loading...";
         submitButton["disabled"] = true;
         postScore(username, this.score)
-          .then(() => {
+          .then(({ runs, myRun }) => {
             nameform.destroy();
             this.add.image(
               C.SCREEN_WIDTH / 2,
@@ -361,7 +362,7 @@ export default class Game extends Phaser.Scene {
             this.add
               .text(
                 C.SCREEN_WIDTH / 2,
-                C.SCREEN_HEIGHT / 2 - 200,
+                C.SCREEN_HEIGHT / 2 - 202,
                 "Leaderboard",
                 {
                   fontFamily: C.FONT_FAMILY,
@@ -371,30 +372,41 @@ export default class Game extends Phaser.Scene {
                 }
               )
               .setOrigin(0.5, 0);
-            const leaderboard = this.add
+            this.add
               .text(
                 C.SCREEN_WIDTH / 2,
-                C.SCREEN_HEIGHT / 2 - 150,
-                "Loading...",
+                C.SCREEN_HEIGHT / 2 - 155,
+                runs
+                  .map((run) => `${run.rank}. ${run.username} (${run.score})`)
+                  .slice(0, 9)
+                  .join("\n"),
                 {
                   fontFamily: C.FONT_FAMILY,
                   fontSize: "20px",
+                  align: "center",
                   color: "black",
                 }
               )
               .setOrigin(0.5, 0);
-            getLeaderboard().then(({ runs }) => {
-              const text = runs
-                .map((run) => `${run.username}: ${run.score}`)
-                .join("\n");
-              console.log(text);
-              leaderboard.setText(text);
-            });
+            this.add
+              .text(
+                C.SCREEN_WIDTH / 2,
+                C.SCREEN_HEIGHT / 2 + 77,
+                `Your rank: ${myRun.rank}`,
+                {
+                  fontFamily: C.FONT_FAMILY,
+                  fontSize: "20px",
+                  fontStyle: "bold",
+                  color: "black",
+                }
+              )
+              .setOrigin(0.5, 0);
           })
           .catch(() => {
             usernameField["disabled"] = false;
             usernameField["value"] = "ERROR (please try again)";
             submitButton["disabled"] = false;
+            submitButton["value"] = "Submit score";
           });
       }
     });
