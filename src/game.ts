@@ -217,6 +217,11 @@ export default class Game extends Phaser.Scene {
         this.rack.resetActiveTile();
         const randomIndex = Math.floor(Math.random() * column.tiles.length);
         if (column.isWord) {
+          // case where it is valid word during earthquake but wasn't locked before
+          // --> should still score
+          if (!column.isLocked) {
+            this.updateScore(column.score(), column);
+          }
           column.removeTile(randomIndex);
           column.unlock();
         } else {
@@ -273,27 +278,7 @@ export default class Game extends Phaser.Scene {
       (numRackableTiles) => this.rack.fill(numRackableTiles),
       (tile) => this.moveTileToRack(column, tile),
       (score) => {
-        this.score += score;
-        this.updateScoreText();
-        const scoreAnimation = this.add.text(
-          column.x,
-          column.y + column.tiles[0].y - 20,
-          `+${score}`,
-          {
-            fontFamily: C.FONT_FAMILY,
-            fontSize: "20px",
-            fontStyle: "bold",
-            color: "#d29465",
-          }
-        );
-        this.tweens.add({
-          targets: scoreAnimation,
-          props: { y: scoreAnimation.y - 50, alpha: 0 },
-          duration: 700,
-          onComplete: () => {
-            scoreAnimation.destroy();
-          },
-        });
+        this.updateScore(score, column);
       }
     );
     this.columns.splice(i, 0, column);
@@ -428,6 +413,30 @@ export default class Game extends Phaser.Scene {
         this.scene.start("gameover", {
           score: this.score,
         });
+      },
+    });
+  }
+
+  updateScore(score: number, column: Column) {
+    this.score += score;
+    this.updateScoreText();
+    const scoreAnimation = this.add.text(
+      column.x,
+      column.y + column.tiles[0].y - 20,
+      `+${score}`,
+      {
+        fontFamily: C.FONT_FAMILY,
+        fontSize: "20px",
+        fontStyle: "bold",
+        color: "#d29465",
+      }
+    );
+    this.tweens.add({
+      targets: scoreAnimation,
+      props: { y: scoreAnimation.y - 50, alpha: 0 },
+      duration: 700,
+      onComplete: () => {
+        scoreAnimation.destroy();
       },
     });
   }
