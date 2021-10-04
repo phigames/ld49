@@ -2,9 +2,11 @@ import "phaser";
 import Column from "./column";
 import * as C from "./constants";
 import { Dictionary } from "./dictionary";
+import { getLeaderboard, postScore } from "./leaderboard";
 import Rack from "./rack";
+import TextBox from "./textbox";
 import Tile from "./tile";
-import Endscreen from "./endscreen";
+import Gameover from "./gameover";
 
 export default class Game extends Phaser.Scene {
   rack: Rack;
@@ -12,11 +14,13 @@ export default class Game extends Phaser.Scene {
   clock: Phaser.GameObjects.Text;
   clockTime: number;
   clockState: "none" | "running" | "delay";
+  timer: Phaser.Time.TimerEvent;
   levelDisplay: Phaser.GameObjects.Text;
   level: number;
   dictionary: Dictionary;
   score: number;
   scoreText: Phaser.GameObjects.Text;
+  tutorial: TextBox;
 
   constructor() {
     super("game");
@@ -32,12 +36,14 @@ export default class Game extends Phaser.Scene {
     this.load.image("arrow", "assets/arrow.png");
     this.load.image("ok1", "assets/ok1.png");
     this.load.image("ok2", "assets/ok2.png");
+    this.load.audio("music", "assets/music.ogg");
     this.load.json("wordList", "assets/words.json");
-    this.level = 0;
-    this.clockState = "none";
+    this.load.html("nameform", "assets/nameform.html");
   }
 
   create() {
+    this.sound.pauseOnBlur = false;
+
     this.add.image(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2, "background");
     const data = this.cache.json.get("wordList");
     this.dictionary = new Dictionary(data);
@@ -71,7 +77,7 @@ export default class Game extends Phaser.Scene {
 
     this.clockTime = C.TIME_PER_LEVEL;
     this.clock = this.add
-      .text(50, 380, "", {
+      .text(55, 380, "", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "30px",
         align: "center",
@@ -79,7 +85,7 @@ export default class Game extends Phaser.Scene {
       })
       .setOrigin(0.5);
     this.add
-      .text(50, 404, "sec until", {
+      .text(60, 404, "sec until", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "16px",
         align: "center",
@@ -88,7 +94,7 @@ export default class Game extends Phaser.Scene {
       })
       .setOrigin(0.5);
     this.add
-      .text(50, 420, "earthquake", {
+      .text(60, 420, "earthquake", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "16px",
         align: "center",
@@ -107,7 +113,7 @@ export default class Game extends Phaser.Scene {
       })
       .setOrigin(0.5);
     this.add
-      .text(590, 410, "earthquakes", {
+      .text(594, 410, "earthquakes", {
         fontFamily: C.FONT_FAMILY,
         fontSize: "16px",
         align: "center",
@@ -117,60 +123,77 @@ export default class Game extends Phaser.Scene {
       .setOrigin(0.5);
     this.updateLevelDisplay();
 
-    // Test functions for removing/adding rack tiles (hehe)
-    this.input.keyboard.on(
-      "keydown-R",
-      function () {
-        this.rack.removeTile(0);
-      },
-      this
-    );
-    this.input.keyboard.on(
-      "keydown-F",
-      function () {
-        console.log(this.rack.addTile("F"));
-      },
-      this
-    );
-    this.input.keyboard.on(
-      "keydown-A",
-      function () {
-        this.rack.fill(8);
-      },
-      this
-    );
-    this.input.keyboard.on(
-      "keydown-C",
-      function () {
-        this.moveTileToRack(this.columns[0], 0);
-      },
-      this
-    );
+    this.clockState = "none";
 
-    this.input.keyboard.on(
-      "keydown-X",
-      function () {
-        console.log("endscreen started");
-        this.scene.start("endscreen", {
-          score: this.score,
-        });
-      },
-      this
-    );
+    const messages = [
+      "Make words in the pillars to prevent the temple from collapsing!\n\n" +
+        "Earthquakes will delete letters and make pillars unstable! " +
+        "Fix them fast before they collapse in the next quake.",
+    ];
+    let message = "";
+    for (const elem of messages) {
+      message = message + elem;
+    }
 
-    //
+    this.tutorial = new TextBox(this, message, 35, 20, 370, 344);
+    this.add.existing(this.tutorial);
+
+    // // Test functions for removing/adding rack tiles (hehe)
+    // this.input.keyboard.on(
+    //   "keydown-R",
+    //   function () {
+    //     this.rack.removeTile(0);
+    //   },
+    //   this
+    // );
+    // this.input.keyboard.on(
+    //   "keydown-F",
+    //   function () {
+    //     console.log(this.rack.addTile("F"));
+    //   },
+    //   this
+    // );
+    // this.input.keyboard.on(
+    //   "keydown-A",
+    //   function () {
+    //     this.rack.fill(8);
+    //   },
+    //   this
+    // );
+    // this.input.keyboard.on(
+    //   "keydown-C",
+    //   function () {
+    //     this.moveTileToRack(this.columns[0], 0);
+    //   },
+    //   this
+    // );
+
+    // this.input.keyboard.on(
+    //   "keydown-X",
+    //   function () {
+    //     console.log("gameover started");
+    //     this.scene.start("gameover");
+    //   },
+    //   this
+    // );
   }
 
   update() {
     if (this.clockState === "none") {
-      if (this.columns.some((column) => column.isLocked === true)) {
+      if (
+        this.columns.some(
+          (column) => column.isLocked === true && column.tiles.length > 0
+        )
+      ) {
         this.clockState = "running";
+        this.tutorial.destroy();
+        this.sound.play("music");
       }
     }
 
     // clock
     if (this.clockState == "running") {
-      const timedEvent = this.time.addEvent({
+      this.timer = this.time.addEvent({
         delay: 1000,
         callback: this.onClockTick,
         callbackScope: this,
@@ -185,20 +208,20 @@ export default class Game extends Phaser.Scene {
     this.clockTime -= 1; // One second
     if (this.clockTime == 0) {
       this.cameras.main.shake(
-        C.EARTHQUAKE_DURATION * 1000,
+        C.EARTHQUAKE_DURATION * 1500,
         C.EARTHQUAKE_INTENSITY
       );
-      this.level++;
-      if (this.level >= C.NUMBER_OF_LEVELS) {
-        alert("WOW SUCH FINISH!!!11!");
-      }
-      this.updateLevelDisplay();
       for (let i = 0; i < this.columns.length; i++) {
         const column = this.columns[i];
         column.hideAddButton();
         this.rack.resetActiveTile();
         const randomIndex = Math.floor(Math.random() * column.tiles.length);
         if (column.isWord) {
+          // case where it is valid word during earthquake but wasn't locked before
+          // --> should still score
+          if (!column.isLocked) {
+            this.updateScore(column.score(), column);
+          }
           column.removeTile(randomIndex);
           column.unlock();
         } else {
@@ -210,23 +233,24 @@ export default class Game extends Phaser.Scene {
           this.addColumn(i);
           column.destroy(true);
         }
-        // Endscreen Condition
+        // Losing condition
         if (!this.columns.some((column) => column.tiles.length > 0)) {
-          console.log("no pillars left");
-          this.time.addEvent({
-            delay: 2000,
-            loop: false,
-            callback: () => {
-              this.scene.start("endscreen", {
-                score: this.score,
-              });
-            },
-          });
+          this.lose();
         }
       }
       this.rack.fill(8);
+      this.level++;
+      // Winning condition
+      if (
+        this.level >= C.NUMBER_OF_LEVELS &&
+        this.columns.some((column) => column.tiles.length > 0)
+      ) {
+        this.win();
+      }
+      this.updateLevelDisplay();
     } else if (this.clockTime <= -C.PAUSE_AFTER_EARTHQUAKE) {
       this.clockTime = C.TIME_PER_LEVEL;
+      this.sound.play("music");
     }
     this.updateClock();
   }
@@ -254,8 +278,7 @@ export default class Game extends Phaser.Scene {
       (numRackableTiles) => this.rack.fill(numRackableTiles),
       (tile) => this.moveTileToRack(column, tile),
       (score) => {
-        this.score += score;
-        this.updateScoreText();
+        this.updateScore(score, column);
       }
     );
     this.columns.splice(i, 0, column);
@@ -285,6 +308,138 @@ export default class Game extends Phaser.Scene {
       this.rack.addTile(tile.letter);
     }
   }
+
+  win() {
+    this.timer.destroy();
+    this.clockTime = -1;
+
+    this.time.addEvent({
+      delay: 2000,
+      loop: false,
+      callback: () => {
+        for (const column of this.columns) {
+          column.lock();
+        }
+        this.add.text(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, "You won!");
+      },
+    });
+
+    const winText = this.add
+      .text(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2, "YOU DID IT!", {
+        fontFamily: C.FONT_FAMILY,
+        fontSize: "70px",
+        fontStyle: "bold",
+        color: "#d29465",
+      })
+      .setOrigin(0.5);
+    winText.setAlpha(0);
+
+    const nameform = this.add
+      .dom(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2)
+      .createFromCache("nameform");
+    nameform.setAlpha(0);
+    const usernameField = nameform.getChildByName("username");
+    const form = nameform.getChildByID("nameform");
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const username: string = usernameField["value"];
+      if (username.trim() !== "") {
+        usernameField["disabled"] = true;
+        postScore(username, this.score)
+          .then(() => {
+            nameform.destroy();
+            this.add
+              .text(
+                C.SCREEN_WIDTH / 2,
+                C.SCREEN_HEIGHT / 2 - 200,
+                "Leaderboard",
+                {
+                  fontFamily: C.FONT_FAMILY,
+                  fontSize: "30px",
+                  fontStyle: "bold",
+                  color: "black",
+                  backgroundColor: "white",
+                }
+              )
+              .setOrigin(0.5, 0);
+            const leaderboard = this.add
+              .text(
+                C.SCREEN_WIDTH / 2,
+                C.SCREEN_HEIGHT / 2 - 150,
+                "Loading...",
+                {
+                  fontFamily: C.FONT_FAMILY,
+                  fontSize: "25px",
+                  color: "black",
+                  backgroundColor: "white",
+                }
+              )
+              .setOrigin(0.5, 0);
+            getLeaderboard().then(({ runs }) => {
+              const text = runs
+                .map((run) => `${run.username}: ${run.score}`)
+                .join("\n");
+              console.log(text);
+              leaderboard.setText(text);
+            });
+          })
+          .catch(() => {
+            usernameField["disabled"] = false;
+            usernameField["value"] = "ERROR (please try again)";
+          });
+      }
+    });
+
+    this.tweens.add({
+      targets: nameform,
+      props: { y: 300, alpha: 1 },
+      duration: 3000,
+      ease: "Power3",
+    });
+    this.tweens.add({
+      targets: winText,
+      props: { y: 200, alpha: 1 },
+      duration: 3000,
+      ease: "Power3",
+    });
+  }
+
+  lose() {
+    this.timer.destroy();
+    this.time.addEvent({
+      delay: 2000,
+      loop: false,
+      callback: () => {
+        this.scene.start("gameover", {
+          score: this.score,
+        });
+      },
+    });
+  }
+
+  updateScore(score: number, column: Column) {
+    this.score += score;
+    this.updateScoreText();
+    const scoreAnimation = this.add.text(
+      column.x,
+      column.y + column.tiles[0].y - 20,
+      `+${score}`,
+      {
+        fontFamily: C.FONT_FAMILY,
+        fontSize: "20px",
+        fontStyle: "bold",
+        color: "#d29465",
+      }
+    );
+    this.tweens.add({
+      targets: scoreAnimation,
+      props: { y: scoreAnimation.y - 50, alpha: 0 },
+      duration: 700,
+      onComplete: () => {
+        scoreAnimation.destroy();
+      },
+    });
+  }
 }
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -292,7 +447,7 @@ const config: Phaser.Types.Core.GameConfig = {
   backgroundColor: "#125555",
   width: C.SCREEN_WIDTH,
   height: C.SCREEN_HEIGHT,
-  scene: [Game, Endscreen],
+  scene: [Game, Gameover],
   scale: {
     zoom:
       window.innerHeight >= C.SCREEN_HEIGHT * 2 &&
@@ -309,6 +464,7 @@ const config: Phaser.Types.Core.GameConfig = {
   dom: {
     createContainer: true,
   },
+  parent: "parent",
 };
 
 const game = new Phaser.Game(config);

@@ -15,6 +15,8 @@ export default class Column extends Phaser.GameObjects.Container {
   onTileClick: Function;
   isWord: boolean;
   isLocked: boolean;
+  highlight: Phaser.GameObjects.Rectangle;
+  highlightRect: Phaser.GameObjects.Graphics;
 
   constructor(
     scene: Phaser.Scene,
@@ -62,6 +64,20 @@ export default class Column extends Phaser.GameObjects.Container {
     this.onTileClick = onTileClick;
     this.addButton.on("pointerup", this.onAddButtonClick);
 
+    // Highlight on mouseover
+    this.addButton.on("pointerover", () => {
+      this.highlightRect = new Phaser.GameObjects.Graphics(this.scene);
+      this.highlightRect.fillStyle(0xffffff, 0.3);
+      this.highlightRect.fillRoundedRect(0 - 16, 100 - 24, 32, 48, 2);
+      this.add(this.highlightRect);
+    });
+    this.addButton.on("pointerout", () => {
+      this.highlightRect.destroy();
+    });
+    this.addButton.on("pointerup", () => {
+      this.highlightRect.destroy();
+    });
+
     this.add(this.lockButton);
     this.onLockButtonClick = onLockButtonClick;
     this.onCountScore = onCountScore;
@@ -69,6 +85,20 @@ export default class Column extends Phaser.GameObjects.Container {
       this.onLockButtonClick(this.countNewTiles());
       this.lock();
       this.onCountScore(this.score());
+    });
+
+    // Highlight on mouseover
+    this.lockButton.on("pointerover", () => {
+      this.highlightRect = new Phaser.GameObjects.Graphics(this.scene);
+      this.highlightRect.fillStyle(0xffffff, 0.3);
+      this.highlightRect.fillRoundedRect(30 - 16, 70 - 16, 32, 32, 3);
+      this.add(this.highlightRect);
+    });
+    this.lockButton.on("pointerout", () => {
+      this.highlightRect.destroy();
+    });
+    this.lockButton.on("pointerup", () => {
+      this.highlightRect.destroy();
     });
   }
 
@@ -123,8 +153,15 @@ export default class Column extends Phaser.GameObjects.Container {
   removeTile(index: number) {
     this.tiles[index].destroy();
     this.tiles.splice(index, 1);
+    // Auto-lock if no rackable tiles
+    if (!this.tiles.some((tile) => tile.rackable)) {
+      this.lock();
+    }
     this.updateTileCoords();
     this.checkCorrectWord();
+    if (this.tiles.length === 0) {
+      this.makeColShadowy();
+    }
   }
 
   updateTileCoords(animate: boolean = false, excludeTile?: Tile) {
@@ -153,6 +190,9 @@ export default class Column extends Phaser.GameObjects.Container {
       }
       nextTileY += distance;
     }
+    if (this.tiles.length === 0) {
+      this.makeColShadowy();
+    }
   }
 
   showAddButton() {
@@ -180,9 +220,12 @@ export default class Column extends Phaser.GameObjects.Container {
 
   updateLockButton() {
     if (this.isWord) {
-      this.lockButton.setVisible(true);
+      if (this.tiles.some((tile) => tile.rackable)) {
+        this.lockButton.setVisible(true);
+        this.bringToTop(this.lockButton);
+      }
       if (this.isLocked) {
-        this.lockButton.setTexture("letter-O");
+        this.lockButton.setVisible(false);
         this.scene.input.disable(this.lockButton);
         for (const tile of this.tiles) {
           tile.lock();
@@ -238,7 +281,7 @@ export default class Column extends Phaser.GameObjects.Container {
     for (let i = 0; i < this.tiles.length; i++) {
       const tile = this.tiles[i];
       if (!tile.rackable) {
-        tile.setTint(0xe0e0e0);
+        tile.setTint(0xc4c4c4);
       } else {
         tile.clearTint();
       }
@@ -246,6 +289,7 @@ export default class Column extends Phaser.GameObjects.Container {
   }
 
   makeColShadowy() {
+    this.background.setTexture("column");
     this.background.setTint(0xa9a9a9);
     this.background.setAlpha(0.7);
   }
